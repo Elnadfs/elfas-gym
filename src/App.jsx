@@ -1,38 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import extractedMembers from './extracted_members.json';
+import gymLogo from './assets/logo.jpg';
 
-// Default Dummy Data
+// Default Packages
 const defaultPackages = [
   { id: 'pkg-1', name: 'Bulanan Regular', duration: 1, price: 350000 },
   { id: 'pkg-2', name: '3 Bulan Hemat', duration: 3, price: 900000 },
   { id: 'pkg-3', name: 'Tahunan VIP', duration: 12, price: 3200000 }
 ];
 
-const defaultMembers = [
-  { 
-    id: 'MBR-001', 
-    name: 'Rian Hidayat', 
-    phone: '081234567890', 
-    packageId: 'pkg-1', 
-    startDate: '2026-08-01', 
-    endDate: '2026-09-01' 
-  },
-  { 
-    id: 'MBR-002', 
-    name: 'Siti Aminah', 
-    phone: '085678901234', 
-    packageId: 'pkg-2', 
-    startDate: '2026-06-15', 
-    endDate: '2026-09-15' 
-  },
-  { 
-    id: 'MBR-003', 
-    name: 'Budi Santoso', 
-    phone: '087890123456', 
-    packageId: 'pkg-1', 
-    startDate: '2026-07-05', 
-    endDate: '2026-08-05' 
-  }
-];
+const defaultMembers = extractedMembers;
 
 const defaultProducts = [
   { id: 'prod-1', name: 'Air Mineral 600ml', price: 5000, stock: 48 },
@@ -41,23 +18,9 @@ const defaultProducts = [
   { id: 'prod-4', name: 'Gym T-Shirt Fit', price: 120000, stock: 8 }
 ];
 
-const defaultDailyVisitors = [
-  { id: 'DLY-001', name: 'Fikri Alamsyah', phone: '089912345678', date: '2026-08-10', amountPaid: 35000 },
-  { id: 'DLY-002', name: 'Hendra Wijaya', phone: '081122334455', date: '2026-08-11', amountPaid: 35000 }
-];
-
-const defaultExpenses = [
-  { id: 'EXP-1001', date: '2026-08-02', desc: 'Listrik & Air Bulanan', amount: 450000, paymentMethod: 'Cash' },
-  { id: 'EXP-1002', date: '2026-08-05', desc: 'Beli Sabun & Tisu Toilet', amount: 75000, paymentMethod: 'Cash' }
-];
-
-const defaultTransactions = [
-  { id: 'TX-1001', memberName: 'Rian Hidayat', type: 'Membership', desc: 'Bulanan Regular', date: '2026-08-01', amount: 350000, paymentMethod: 'Cash' },
-  { id: 'TX-1002', memberName: 'Siti Aminah', type: 'Membership', desc: '3 Bulan Hemat', date: '2026-06-15', amount: 900000, paymentMethod: 'QRIS' },
-  { id: 'TX-1003', memberName: 'Budi Santoso', type: 'Membership', desc: 'Bulanan Regular', date: '2026-07-05', amount: 350000, paymentMethod: 'Cash' },
-  { id: 'TX-1004', memberName: 'Fikri Alamsyah', type: 'Kunjungan Harian', desc: 'Daily Pass', date: '2026-08-10', amount: 35000, paymentMethod: 'Cash' },
-  { id: 'TX-1005', memberName: 'Hendra Wijaya', type: 'Kunjungan Harian', desc: 'Daily Pass', date: '2026-08-11', amount: 35000, paymentMethod: 'QRIS' }
-];
+const defaultDailyVisitors = [];
+const defaultExpenses = [];
+const defaultTransactions = [];
 
 export default function App() {
   // Tabs: overview, members, daily_visitors, gym_store, packages, transactions, reports
@@ -66,7 +29,15 @@ export default function App() {
   // Data States
   const [members, setMembers] = useState(() => {
     const local = localStorage.getItem('gymfit_members');
-    return local ? JSON.parse(local) : defaultMembers;
+    if (local) {
+      try {
+        const parsed = JSON.parse(local);
+        if (Array.isArray(parsed) && parsed.length > 10) {
+          return parsed;
+        }
+      } catch (e) {}
+    }
+    return defaultMembers;
   });
   
   const [packages, setPackages] = useState(() => {
@@ -81,7 +52,13 @@ export default function App() {
 
   const [dailyVisitors, setDailyVisitors] = useState(() => {
     const local = localStorage.getItem('gymfit_daily_visitors');
-    return local ? JSON.parse(local) : defaultDailyVisitors;
+    if (local) {
+      try {
+        const parsed = JSON.parse(local);
+        return parsed.filter(d => !d.id.startsWith('DLY-00'));
+      } catch (e) {}
+    }
+    return defaultDailyVisitors;
   });
 
   const [dailyPrice, setDailyPrice] = useState(() => {
@@ -91,12 +68,29 @@ export default function App() {
   
   const [transactions, setTransactions] = useState(() => {
     const local = localStorage.getItem('gymfit_transactions');
-    return local ? JSON.parse(local) : defaultTransactions;
+    if (local) {
+      try {
+        const parsed = JSON.parse(local);
+        return parsed.filter(t => !t.id.startsWith('TX-100'));
+      } catch (e) {}
+    }
+    return defaultTransactions;
   });
 
   const [expenses, setExpenses] = useState(() => {
     const local = localStorage.getItem('gymfit_expenses');
-    return local ? JSON.parse(local) : defaultExpenses;
+    if (local) {
+      try {
+        const parsed = JSON.parse(local);
+        return parsed.filter(e => !e.id.startsWith('EXP-100'));
+      } catch (e) {}
+    }
+    return defaultExpenses;
+  });
+
+  const [attendanceLogs, setAttendanceLogs] = useState(() => {
+    const local = localStorage.getItem('gymfit_attendance_logs');
+    return local ? JSON.parse(local) : [];
   });
 
   // Sync to LocalStorage
@@ -128,11 +122,79 @@ export default function App() {
     localStorage.setItem('gymfit_expenses', JSON.stringify(expenses));
   }, [expenses]);
 
+  useEffect(() => {
+    localStorage.setItem('gymfit_attendance_logs', JSON.stringify(attendanceLogs));
+  }, [attendanceLogs]);
+
+  // Authentication State
+  const [currentUser, setCurrentUser] = useState(() => {
+    const local = localStorage.getItem('gymfit_auth_user');
+    return local ? JSON.parse(local) : null;
+  });
+
+  const [loginForm, setLoginForm] = useState({
+    username: '',
+    password: '',
+    remember: true
+  });
+  const [loginError, setLoginError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleLogin = (e) => {
+    if (e) e.preventDefault();
+    setLoginError('');
+    const u = loginForm.username.trim().toLowerCase();
+    const p = loginForm.password.trim();
+
+    if (u === 'elnad' && p === '251203') {
+      const user = { username: 'elnad', name: 'Elnad (Owner)', role: 'owner' };
+      setCurrentUser(user);
+      if (loginForm.remember) {
+        localStorage.setItem('gymfit_auth_user', JSON.stringify(user));
+      }
+    } else if (u === 'elfas' && p === 'fitnessbugar') {
+      const user = { username: 'elfas', name: 'Kasir Elfas Fitness', role: 'staff' };
+      setCurrentUser(user);
+      if (loginForm.remember) {
+        localStorage.setItem('gymfit_auth_user', JSON.stringify(user));
+      }
+    } else {
+      setLoginError('Username atau Password salah! Periksa kembali.');
+    }
+  };
+
+  const handleLogout = () => {
+    if (window.confirm('Apakah Anda yakin ingin keluar (Logout)?')) {
+      setCurrentUser(null);
+      localStorage.removeItem('gymfit_auth_user');
+      setLoginForm({ username: '', password: '', remember: true });
+    }
+  };
+
+  const handleQuickPresetLogin = (role) => {
+    if (role === 'owner') {
+      const user = { username: 'elnad', name: 'Elnad (Owner)', role: 'owner' };
+      setCurrentUser(user);
+      localStorage.setItem('gymfit_auth_user', JSON.stringify(user));
+    } else {
+      const user = { username: 'elfas', name: 'Kasir Elfas Fitness', role: 'staff' };
+      setCurrentUser(user);
+      localStorage.setItem('gymfit_auth_user', JSON.stringify(user));
+    }
+  };
+
   // Search & Filter States
   const [memberSearch, setMemberSearch] = useState('');
   const [memberFilterStatus, setMemberFilterStatus] = useState('all');
+  const [memberPage, setMemberPage] = useState(1);
+  const [memberPageSize, setMemberPageSize] = useState(25);
   const [dailySearch, setDailySearch] = useState('');
   const [expenseSearch, setExpenseSearch] = useState('');
+
+  // Check-In State
+  const [quickCheckInInput, setQuickCheckInInput] = useState('');
+  const [checkInAlert, setCheckInAlert] = useState(null);
+  const [isTodayAttendanceOpen, setIsTodayAttendanceOpen] = useState(false);
 
   // Report State
   const [reportPeriod, setReportPeriod] = useState('month'); // today, week, month, year, custom
@@ -153,6 +215,7 @@ export default function App() {
 
   // Modals States
   const [isMemberModalOpen, setIsMemberModalOpen] = useState(false);
+  const [isRenewModalOpen, setIsRenewModalOpen] = useState(false);
   const [isPackageModalOpen, setIsPackageModalOpen] = useState(false);
   const [isDailyModalOpen, setIsDailyModalOpen] = useState(false);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
@@ -165,6 +228,17 @@ export default function App() {
     phone: '',
     packageId: defaultPackages[0]?.id || '',
     startDate: new Date().toISOString().split('T')[0],
+    endDate: '',
+    paymentMethod: 'Cash'
+  });
+
+  const [renewForm, setRenewForm] = useState({
+    memberId: '',
+    memberName: '',
+    phone: '',
+    packageId: defaultPackages[0]?.id || '',
+    renewStartDate: new Date().toISOString().split('T')[0],
+    renewEndDate: '',
     paymentMethod: 'Cash'
   });
 
@@ -321,12 +395,19 @@ export default function App() {
 
   // CRUD Member Actions
   const handleOpenAddMember = () => {
+    const today = new Date().toISOString().split('T')[0];
+    const defaultPkg = packages[0] || { id: 'pkg-1', duration: 1 };
+    const d = new Date(today);
+    d.setMonth(d.getMonth() + (defaultPkg.duration || 1));
+    const defaultEnd = d.toISOString().split('T')[0];
+
     setMemberForm({
       id: '',
       name: '',
       phone: '',
-      packageId: packages[0]?.id || '',
-      startDate: new Date().toISOString().split('T')[0],
+      packageId: defaultPkg.id || '',
+      startDate: today,
+      endDate: defaultEnd,
       paymentMethod: 'Cash'
     });
     setIsMemberModalOpen(true);
@@ -337,8 +418,9 @@ export default function App() {
       id: member.id,
       name: member.name,
       phone: member.phone,
-      packageId: member.packageId,
+      packageId: member.packageId || packages[0]?.id || '',
       startDate: member.startDate,
+      endDate: member.endDate,
       paymentMethod: member.paymentMethod || 'Cash'
     });
     setIsMemberModalOpen(true);
@@ -349,10 +431,13 @@ export default function App() {
     const selectedPkg = packages.find(p => p.id === memberForm.packageId);
     const duration = selectedPkg ? selectedPkg.duration : 1;
 
-    const startDate = new Date(memberForm.startDate);
-    const endDate = new Date(startDate);
-    endDate.setMonth(startDate.getMonth() + duration);
-    const endDateStr = endDate.toISOString().split('T')[0];
+    let finalEndDate = memberForm.endDate;
+    if (!finalEndDate) {
+      const startDate = new Date(memberForm.startDate);
+      const endDate = new Date(startDate);
+      endDate.setMonth(startDate.getMonth() + duration);
+      finalEndDate = endDate.toISOString().split('T')[0];
+    }
 
     if (memberForm.id) {
       // Edit
@@ -362,34 +447,38 @@ export default function App() {
         phone: memberForm.phone,
         packageId: memberForm.packageId,
         startDate: memberForm.startDate,
-        endDate: endDateStr
+        endDate: finalEndDate,
+        paymentMethod: memberForm.paymentMethod
       } : m));
     } else {
-      // Add New
-      const newId = `MBR-${String(members.length + 1).padStart(3, '0')}`;
+      // Add New Member
+      const nextNum = members.length + 1;
+      const newId = `MBR-${String(nextNum).padStart(4, '0')}`;
       const newMember = {
         id: newId,
         name: memberForm.name,
         phone: memberForm.phone,
         packageId: memberForm.packageId,
         startDate: memberForm.startDate,
-        endDate: endDateStr,
+        endDate: finalEndDate,
+        totalVisits: 0,
+        historyCount: 1,
         paymentMethod: memberForm.paymentMethod
       };
-      setMembers(prev => [...prev, newMember]);
+      setMembers(prev => [newMember, ...prev]);
 
-      // Record transaction
+      // Record initial membership transaction
       if (selectedPkg) {
         const txId = `TX-${Date.now().toString().slice(-6)}`;
-        setTransactions(prev => [...prev, {
+        setTransactions(prev => [{
           id: txId,
           memberName: memberForm.name,
           type: 'Membership',
-          desc: selectedPkg.name,
+          desc: `Member Baru: ${selectedPkg.name}`,
           date: memberForm.startDate,
           amount: selectedPkg.price,
           paymentMethod: memberForm.paymentMethod
-        }]);
+        }, ...prev]);
       }
     }
     setIsMemberModalOpen(false);
@@ -398,6 +487,185 @@ export default function App() {
   const handleDeleteMember = (id) => {
     if (window.confirm('Apakah Anda yakin ingin menghapus member ini?')) {
       setMembers(prev => prev.filter(m => m.id !== id));
+    }
+  };
+
+  // Membership Renewal Actions
+  const handleOpenRenewMember = (member) => {
+    const today = new Date().toISOString().split('T')[0];
+    const isCurrentlyActive = getStatus(member.endDate) === 'Active';
+    // If active, extend starting from current expiry date; if expired, start extension from today
+    const initialStartDate = isCurrentlyActive && member.endDate >= today ? member.endDate : today;
+    const defaultPkg = packages.find(p => p.id === member.packageId) || packages[0] || { id: 'pkg-1', duration: 1, price: 350000 };
+    
+    // Compute new end date
+    const d = new Date(initialStartDate);
+    d.setMonth(d.getMonth() + (defaultPkg.duration || 1));
+    const initialEndDate = d.toISOString().split('T')[0];
+
+    setRenewForm({
+      memberId: member.id,
+      memberName: member.name,
+      phone: member.phone,
+      packageId: defaultPkg.id,
+      renewStartDate: initialStartDate,
+      renewEndDate: initialEndDate,
+      paymentMethod: 'Cash'
+    });
+    setIsRenewModalOpen(true);
+  };
+
+  const handleSaveRenew = (e) => {
+    e.preventDefault();
+    const selectedPkg = packages.find(p => p.id === renewForm.packageId);
+    if (!selectedPkg) return;
+
+    let finalEndDate = renewForm.renewEndDate;
+    if (!finalEndDate) {
+      const startDate = new Date(renewForm.renewStartDate);
+      const endDate = new Date(startDate);
+      endDate.setMonth(startDate.getMonth() + (selectedPkg.duration || 1));
+      finalEndDate = endDate.toISOString().split('T')[0];
+    }
+
+    const oldMember = members.find(m => m.id === renewForm.memberId);
+
+    // Update Member dates and package
+    setMembers(prev => prev.map(m => m.id === renewForm.memberId ? {
+      ...m,
+      packageId: renewForm.packageId,
+      startDate: renewForm.renewStartDate,
+      endDate: finalEndDate,
+      historyCount: (m.historyCount || 0) + 1
+    } : m));
+
+    // Record renewal transaction in cashier (with rollback snapshot)
+    const txId = `TX-${Date.now().toString().slice(-6)}`;
+    setTransactions(prev => [{
+      id: txId,
+      memberId: renewForm.memberId,
+      memberName: renewForm.memberName,
+      type: 'Membership',
+      desc: `Perpanjangan: ${selectedPkg.name}`,
+      date: new Date().toISOString().split('T')[0],
+      amount: selectedPkg.price,
+      paymentMethod: renewForm.paymentMethod,
+      previousEndDate: oldMember?.endDate || '',
+      previousStartDate: oldMember?.startDate || '',
+      previousPackageId: oldMember?.packageId || ''
+    }, ...prev]);
+
+    setIsRenewModalOpen(false);
+
+    setCheckInAlert({
+      type: 'success',
+      title: `🎉 Membership Berhasil Diperpanjang!`,
+      message: `${renewForm.memberName} (${renewForm.memberId}) berhasil diperpanjang dengan paket "${selectedPkg.name}".`,
+      details: `Masa aktif baru s/d ${finalEndDate} • Pemasukan ${formatRupiah(selectedPkg.price)} (${renewForm.paymentMethod}) tercatat di kasir.`
+    });
+    setTimeout(() => setCheckInAlert(null), 6000);
+  };
+
+  // Check-In / Attendance Actions
+  const todayStr = new Date().toISOString().split('T')[0];
+  const todayAttendanceList = attendanceLogs.filter(log => log.date === todayStr);
+
+  const handleCheckInMember = (member) => {
+    if (!member) return;
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+    const dateStr = now.toISOString().split('T')[0];
+    const status = getStatus(member.endDate);
+    const updatedVisits = (member.totalVisits || 0) + 1;
+
+    // Update member visits count and last visit
+    setMembers(prev => prev.map(m => m.id === member.id ? {
+      ...m,
+      totalVisits: updatedVisits,
+      lastVisit: dateStr
+    } : m));
+
+    // Record attendance log
+    const newLog = {
+      id: `ATT-${Date.now()}`,
+      memberId: member.id,
+      memberName: member.name,
+      phone: member.phone,
+      date: dateStr,
+      time: timeStr,
+      statusAtCheckIn: status,
+      visitNumber: updatedVisits
+    };
+
+    setAttendanceLogs(prev => [newLog, ...prev]);
+
+    // Show alert notification banner
+    if (status === 'Active') {
+      setCheckInAlert({
+        type: 'success',
+        title: `✅ Check-In Berhasil!`,
+        message: `${member.name} (${member.id}) telah diabsen masuk pada pukul ${timeStr}.`,
+        details: `Kunjungan ke-${updatedVisits} • Status: Membership Aktif (s/d ${member.endDate})`
+      });
+    } else {
+      setCheckInAlert({
+        type: 'warning',
+        title: `⚠️ Check-In Berhasil (Status EXPIRED)`,
+        message: `${member.name} (${member.id}) telah diabsen pada ${timeStr}, namun paket membership sudah habis sejak ${member.endDate}.`,
+        details: `Kunjungan ke-${updatedVisits} • Silakan tawarkan perpanjangan membership.`
+      });
+    }
+
+    // Auto hide alert after 6 seconds
+    setTimeout(() => {
+      setCheckInAlert(null);
+    }, 6000);
+  };
+
+  const handleQuickCheckInSubmit = (e) => {
+    e.preventDefault();
+    const query = quickCheckInInput.trim();
+    if (!query) return;
+
+    const qLower = query.toLowerCase();
+    const qNum = query.replace(/\D/g, '');
+
+    const found = members.find(m => {
+      const idLower = m.id.toLowerCase();
+      const mNum = m.id.replace(/\D/g, '');
+      return idLower === qLower ||
+             (qNum && mNum === qNum.padStart(4, '0')) ||
+             (qNum && parseInt(mNum) === parseInt(qNum)) ||
+             m.name.toLowerCase() === qLower ||
+             m.name.toLowerCase().startsWith(qLower);
+    });
+
+    if (found) {
+      handleCheckInMember(found);
+      setQuickCheckInInput('');
+    } else {
+      setCheckInAlert({
+        type: 'error',
+        title: `❌ Member Tidak Ditemukan`,
+        message: `Tidak ada data member yang cocok dengan: "${query}".`,
+        details: `Coba ketik nomor ID (misal: 1, 0001, MBR-0001) atau nama lengkap member.`
+      });
+      setTimeout(() => {
+        setCheckInAlert(null);
+      }, 5000);
+    }
+  };
+
+  const handleDeleteAttendanceLog = (logId, memberId) => {
+    if (window.confirm('Batalkan catatan absensi ini?')) {
+      setAttendanceLogs(prev => prev.filter(l => l.id !== logId));
+      // Optionally decrement member visit count
+      if (memberId) {
+        setMembers(prev => prev.map(m => m.id === memberId ? {
+          ...m,
+          totalVisits: Math.max(0, (m.totalVisits || 1) - 1)
+        } : m));
+      }
     }
   };
 
@@ -623,6 +891,45 @@ export default function App() {
     }
   };
 
+  const handleDeleteTransaction = (id) => {
+    const tx = transactions.find(t => t.id === id);
+    if (!tx) return;
+
+    if (tx.type === 'Membership' && tx.memberId && tx.previousEndDate) {
+      const confirmRollback = window.confirm(
+        `Hapus transaksi perpanjangan ini dan kembalikan masa aktif member "${tx.memberName}" ke tanggal sebelumnya (${tx.previousEndDate})?`
+      );
+      if (confirmRollback) {
+        setMembers(prev => prev.map(m => m.id === tx.memberId ? {
+          ...m,
+          packageId: tx.previousPackageId || m.packageId,
+          startDate: tx.previousStartDate || m.startDate,
+          endDate: tx.previousEndDate,
+          historyCount: Math.max(0, (m.historyCount || 1) - 1)
+        } : m));
+        setTransactions(prev => prev.filter(t => t.id !== id));
+        setCheckInAlert({
+          type: 'warning',
+          title: `↩️ Perpanjangan Dibatalkan`,
+          message: `Transaksi dihapus dan masa aktif ${tx.memberName} dikembalikan ke ${tx.previousEndDate}.`,
+          details: `Pemasukan kasir telah disesuaikan kembali.`
+        });
+        setTimeout(() => setCheckInAlert(null), 5000);
+      }
+    } else {
+      if (window.confirm('Hapus riwayat transaksi ini?')) {
+        setTransactions(prev => prev.filter(t => t.id !== id));
+      }
+    }
+  };
+
+  const handleClearAllTransactions = () => {
+    if (window.confirm('Hapus SELURUH riwayat transaksi? Semua data pemasukan akan dimulai dari Rp 0.')) {
+      setTransactions([]);
+      localStorage.setItem('gymfit_transactions', JSON.stringify([]));
+    }
+  };
+
   // Cart / POS Actions
   const addToCart = (prod) => {
     const currentQty = cart[prod.id] || 0;
@@ -815,12 +1122,107 @@ export default function App() {
     return { membership, daily, store };
   };
 
+  // IF NOT LOGGED IN, SHOW LOGIN PORTAL
+  if (!currentUser) {
+    return (
+      <div className="login-page-wrapper">
+        <div className="login-card">
+          <div className="login-brand-header">
+            <img 
+              src={gymLogo} 
+              alt="ELFAS GYM & FITNESS" 
+              style={{ 
+                width: '90px', 
+                height: '90px', 
+                borderRadius: '50%', 
+                objectFit: 'cover', 
+                boxShadow: '0 0 30px rgba(0, 242, 254, 0.45)', 
+                border: '2px solid var(--accent)', 
+                marginBottom: '14px' 
+              }} 
+            />
+            <h2 className="login-title">ELFAS FITNESS</h2>
+            <p className="login-subtitle">Sistem Manajemen & Kasir Gym</p>
+          </div>
+
+          {loginError && (
+            <div style={{ padding: '10px 14px', backgroundColor: 'var(--danger-bg)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '10px', color: 'var(--danger)', fontSize: '0.85rem', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span>⚠️</span>
+              <span>{loginError}</span>
+            </div>
+          )}
+
+          <form onSubmit={handleLogin}>
+            <div className="form-group" style={{ marginBottom: '16px' }}>
+              <label>Username / ID Petugas</label>
+              <input 
+                type="text" 
+                className="form-control" 
+                placeholder="Masukkan username"
+                value={loginForm.username}
+                onChange={(e) => setLoginForm(prev => ({ ...prev, username: e.target.value }))}
+                required
+                autoFocus
+              />
+            </div>
+
+            <div className="form-group" style={{ marginBottom: '16px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <label>Password</label>
+                <span 
+                  style={{ fontSize: '0.75rem', color: 'var(--accent)', cursor: 'pointer' }}
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? '👁️ Sembunyikan' : '👁️ Tampilkan'}
+                </span>
+              </div>
+              <input 
+                type={showPassword ? 'text' : 'password'} 
+                className="form-control" 
+                placeholder="Masukkan password"
+                value={loginForm.password}
+                onChange={(e) => setLoginForm(prev => ({ ...prev, password: e.target.value }))}
+                required
+              />
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                <input 
+                  type="checkbox" 
+                  checked={loginForm.remember}
+                  onChange={(e) => setLoginForm(prev => ({ ...prev, remember: e.target.checked }))}
+                />
+                Ingat Sesi Login
+              </label>
+            </div>
+
+            <button type="submit" className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '12px', fontSize: '0.95rem' }}>
+              🔑 Masuk ke Aplikasi
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="app-container">
       {/* Sidebar */}
       <aside>
-        <div className="brand">
-          <div className="brand-icon">💪</div>
+        <div className="brand" style={{ gap: '12px' }}>
+          <img 
+            src={gymLogo} 
+            alt="ELFAS Logo" 
+            style={{ 
+              width: '38px', 
+              height: '38px', 
+              borderRadius: '50%', 
+              objectFit: 'cover', 
+              border: '1.5px solid var(--accent)', 
+              boxShadow: '0 0 10px rgba(0, 242, 254, 0.35)' 
+            }} 
+          />
           <span>ELFAS GYM</span>
         </div>
         <ul className="nav-links">
@@ -873,6 +1275,27 @@ export default function App() {
             </button>
           </li>
         </ul>
+
+        {/* User Profile & Logout on Sidebar */}
+        <div className="user-profile-sidebar">
+          <div className="user-profile-info">
+            <div className="user-avatar">
+              {currentUser.name ? currentUser.name.charAt(0) : 'U'}
+            </div>
+            <div style={{ overflow: 'hidden' }}>
+              <strong style={{ fontSize: '0.85rem', display: 'block', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+                {currentUser.name}
+              </strong>
+              <span className={`badge ${currentUser.role === 'owner' ? 'badge-active' : 'badge-pending'}`} style={{ fontSize: '0.7rem', padding: '1px 6px' }}>
+                {currentUser.role === 'owner' ? '👑 Owner / Admin' : '🏋️ Kasir Gym'}
+              </span>
+            </div>
+          </div>
+          <button className="logout-btn" onClick={handleLogout} title="Keluar dari Akun">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Keluar (Logout)
+          </button>
+        </div>
       </aside>
 
       {/* Main Content */}
@@ -924,6 +1347,15 @@ export default function App() {
             <div className="grid-stats">
               <div className="card-stat">
                 <div className="stat-info">
+                  <p>Member Hadir Hari Ini</p>
+                  <h3 style={{ color: 'var(--accent)' }}>{todayAttendanceList.length} <span style={{ fontSize: '1rem', fontWeight: 'normal', color: 'var(--text-secondary)' }}>orang</span></h3>
+                </div>
+                <div className="stat-icon blue">
+                  <svg viewBox="0 0 24 24"><path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/></svg>
+                </div>
+              </div>
+              <div className="card-stat">
+                <div className="stat-info">
                   <p>Total Member Aktif</p>
                   <h3>{activeMembersCount}</h3>
                 </div>
@@ -942,15 +1374,6 @@ export default function App() {
               </div>
               <div className="card-stat">
                 <div className="stat-info">
-                  <p>Total Pengeluaran</p>
-                  <h3 style={{ color: 'var(--danger)' }}>{formatRupiah(totalExpenses)}</h3>
-                </div>
-                <div className="stat-icon warning">
-                  <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4 6h-4v2h4v2h-4v2h4v2H9V7h6v2z"/></svg>
-                </div>
-              </div>
-              <div className="card-stat">
-                <div className="stat-info">
                   <p>Keuntungan Bersih</p>
                   <h3 style={{ color: netProfit >= 0 ? 'var(--success)' : 'var(--danger)' }}>{formatRupiah(netProfit)}</h3>
                 </div>
@@ -958,6 +1381,68 @@ export default function App() {
                   <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
                 </div>
               </div>
+            </div>
+
+            {/* Quick Check-in Bar on Overview */}
+            <div className="card-table-wrapper" style={{ padding: '16px 20px', marginBottom: '24px', backgroundColor: 'var(--bg-tertiary)', border: '1px solid var(--accent-glow)' }}>
+              <form onSubmit={handleQuickCheckInSubmit} style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '1.2rem' }}>⚡</span>
+                <div style={{ flex: '1 1 240px' }}>
+                  <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>
+                    Quick Check-In Kehadiran Member (Ketik ID / No / Nama):
+                  </label>
+                  <input 
+                    type="text"
+                    className="form-control"
+                    placeholder="Contoh: 0001, 15, atau ketik nama RIDHO lalu Enter..."
+                    value={quickCheckInInput}
+                    onChange={(e) => setQuickCheckInInput(e.target.value)}
+                    style={{ padding: '8px 12px', fontSize: '0.9rem' }}
+                  />
+                </div>
+                <button type="submit" className="btn btn-primary" style={{ height: '40px', marginTop: '18px', padding: '0 18px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span>✓ Absen Masuk</span>
+                </button>
+                {todayAttendanceList.length > 0 && (
+                  <button 
+                    type="button" 
+                    className="btn btn-secondary" 
+                    style={{ height: '40px', marginTop: '18px', fontSize: '0.85rem' }}
+                    onClick={() => setIsTodayAttendanceOpen(true)}
+                  >
+                    📋 Lihat Log Hari Ini ({todayAttendanceList.length})
+                  </button>
+                )}
+              </form>
+
+              {/* Alert Notification Popup */}
+              {checkInAlert && (
+                <div style={{
+                  marginTop: '12px',
+                  padding: '12px 16px',
+                  borderRadius: '10px',
+                  backgroundColor: checkInAlert.type === 'success' ? 'var(--success-bg)' : checkInAlert.type === 'warning' ? 'var(--warning-bg)' : 'var(--danger-bg)',
+                  border: `1px solid ${checkInAlert.type === 'success' ? 'var(--success)' : checkInAlert.type === 'warning' ? 'var(--warning)' : 'var(--danger)'}`,
+                  color: 'var(--text-primary)',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <div>
+                    <strong style={{ color: checkInAlert.type === 'success' ? 'var(--success)' : checkInAlert.type === 'warning' ? 'var(--warning)' : 'var(--danger)' }}>
+                      {checkInAlert.title}
+                    </strong>
+                    <div style={{ fontSize: '0.9rem', marginTop: '2px' }}>{checkInAlert.message}</div>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '2px' }}>{checkInAlert.details}</div>
+                  </div>
+                  <button 
+                    onClick={() => setCheckInAlert(null)} 
+                    style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '1.1rem' }}
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Grafik Omzet Bulanan */}
@@ -1098,67 +1583,38 @@ export default function App() {
             {/* Split breakdown metrics card */}
             <div className="card-table-wrapper" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginBottom: '32px' }}>
               <div>
-                <h4 style={{ color: 'var(--text-secondary)', marginBottom: '8px' }}>Breakdown Kategori Keuangan</h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '16px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-color)', paddingBottom: '8px' }}>
-                    <span>Membership:</span>
-                    <strong style={{ color: 'var(--success)' }}>{formatRupiah(membershipRev)}</strong>
+                <h4 style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>📊 Rincian Sumber Pemasukan</h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', backgroundColor: 'var(--bg-tertiary)', borderRadius: '8px' }}>
+                    <span style={{ fontSize: '0.85rem' }}>🎫 Membership Member</span>
+                    <strong style={{ color: 'var(--text-primary)' }}>{formatRupiah(membershipRev)}</strong>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-color)', paddingBottom: '8px' }}>
-                    <span>Daily Pass:</span>
-                    <strong style={{ color: 'var(--success)' }}>{formatRupiah(dailyRev)}</strong>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', backgroundColor: 'var(--bg-tertiary)', borderRadius: '8px' }}>
+                    <span style={{ fontSize: '0.85rem' }}>🎟️ Kunjungan Harian (Daily)</span>
+                    <strong style={{ color: 'var(--text-primary)' }}>{formatRupiah(dailyRev)}</strong>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-color)', paddingBottom: '8px' }}>
-                    <span>Toko:</span>
-                    <strong style={{ color: 'var(--success)' }}>{formatRupiah(storeRev)}</strong>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', backgroundColor: 'var(--bg-tertiary)', borderRadius: '8px' }}>
+                    <span style={{ fontSize: '0.85rem' }}>🥤 Toko & Suplemen</span>
+                    <strong style={{ color: 'var(--text-primary)' }}>{formatRupiah(storeRev)}</strong>
                   </div>
                 </div>
               </div>
 
               <div>
-                <h4 style={{ color: 'var(--text-secondary)', marginBottom: '8px' }}>Metode Penerimaan Kas</h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '16px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-color)', paddingBottom: '8px' }}>
-                    <span>Cash / Tunai:</span>
+                <h4 style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>💳 Metode Pembayaran</h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', backgroundColor: 'var(--bg-tertiary)', borderRadius: '8px' }}>
+                    <span style={{ fontSize: '0.85rem' }}>💵 Tunai (Cash)</span>
                     <strong style={{ color: 'var(--success)' }}>{formatRupiah(totalCash)}</strong>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-color)', paddingBottom: '8px' }}>
-                    <span>QRIS:</span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', backgroundColor: 'var(--bg-tertiary)', borderRadius: '8px' }}>
+                    <span style={{ fontSize: '0.85rem' }}>📱 Non-Tunai (QRIS / Transfer)</span>
                     <strong style={{ color: 'var(--accent)' }}>{formatRupiah(totalQRIS)}</strong>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-color)', paddingBottom: '8px' }}>
-                    <span>Total Kas Terkumpul:</span>
-                    <strong style={{ color: 'var(--accent)', fontSize: '0.95rem' }}>{formatRupiah(totalRevenue)}</strong>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', backgroundColor: 'var(--bg-tertiary)', borderRadius: '8px' }}>
+                    <span style={{ fontSize: '0.85rem' }}>👥 Total Member Terdaftar</span>
+                    <strong style={{ color: 'var(--text-primary)' }}>{members.length} Member</strong>
                   </div>
-                </div>
-              </div>
-              
-              <div>
-                <h4 style={{ color: 'var(--text-secondary)', marginBottom: '8px' }}>Jatuh Tempo Membership</h4>
-                <div className="table-container" style={{ marginTop: '12px' }}>
-                  <table style={{ fontSize: '0.85rem' }}>
-                    <thead>
-                      <tr>
-                        <th>Nama</th>
-                        <th>Berakhir</th>
-                        <th>Sisa</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {expiringMembers.slice(0, 3).map(m => (
-                        <tr key={m.id}>
-                          <td>
-                            <strong>{m.name}</strong>
-                          </td>
-                          <td>{m.endDate}</td>
-                          <td><span className="badge badge-expired">{getDaysRemaining(m.endDate)} Hari</span></td>
-                        </tr>
-                      ))}
-                      {expiringMembers.length === 0 && (
-                        <tr><td colSpan="3" style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>Aman. Tidak ada yang segera habis.</td></tr>
-                      )}
-                    </tbody>
-                  </table>
                 </div>
               </div>
             </div>
@@ -1166,94 +1622,268 @@ export default function App() {
         )}
 
         {/* MEMBERS TAB */}
-        {activeTab === 'members' && (
-          <div className="card-table-wrapper">
-            <div className="table-header">
-              <div className="table-search">
-                <input 
-                  type="text" 
-                  className="search-input" 
-                  placeholder="Cari member berdasarkan nama atau telepon..."
-                  value={memberSearch}
-                  onChange={(e) => setMemberSearch(e.target.value)}
-                />
-                <select 
-                  className="select-input" 
-                  style={{ maxWidth: '150px' }}
-                  value={memberFilterStatus}
-                  onChange={(e) => setMemberFilterStatus(e.target.value)}
-                >
-                  <option value="all">Semua Status</option>
-                  <option value="Active">Aktif</option>
-                  <option value="Expired">Expired</option>
-                </select>
+        {activeTab === 'members' && (() => {
+          const s = memberSearch.toLowerCase();
+          const filteredMembers = members.filter(m => {
+            const matchesSearch = (m.name && m.name.toLowerCase().includes(s)) || 
+                                  (m.phone && m.phone.includes(s)) || 
+                                  (m.id && m.id.toLowerCase().includes(s));
+            const status = getStatus(m.endDate);
+            const matchesFilter = memberFilterStatus === 'all' || status === memberFilterStatus;
+            return matchesSearch && matchesFilter;
+          });
+
+          const totalPages = Math.max(1, Math.ceil(filteredMembers.length / memberPageSize));
+          const safePage = Math.min(memberPage, totalPages);
+          const startIndex = (safePage - 1) * memberPageSize;
+          const paginatedList = filteredMembers.slice(startIndex, startIndex + memberPageSize);
+
+          const handleReloadElfasData = () => {
+            if (window.confirm(`Muat ulang seluruh ${extractedMembers.length} data member dari Elfas Fitness?`)) {
+              setMembers(extractedMembers);
+              localStorage.setItem('gymfit_members', JSON.stringify(extractedMembers));
+              alert(`Berhasil memuat ${extractedMembers.length} data member!`);
+            }
+          };
+
+          return (
+            <div>
+              {/* Quick Check-In & Alert Area */}
+              <div className="card-table-wrapper" style={{ padding: '16px 20px', marginBottom: '20px', backgroundColor: 'var(--bg-tertiary)', border: '1px solid var(--accent-glow)' }}>
+                <form onSubmit={handleQuickCheckInSubmit} style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '1.2rem' }}>⚡</span>
+                  <div style={{ flex: '1 1 260px' }}>
+                    <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>
+                      Quick Check-In Kehadiran Member (Ketik ID / No / Nama):
+                    </label>
+                    <input 
+                      type="text"
+                      className="form-control"
+                      placeholder="Ketik ID (contoh: 0001, 289) atau Nama member lalu Tekan Enter..."
+                      value={quickCheckInInput}
+                      onChange={(e) => setQuickCheckInInput(e.target.value)}
+                      style={{ padding: '8px 12px', fontSize: '0.9rem' }}
+                    />
+                  </div>
+                  <button type="submit" className="btn btn-primary" style={{ height: '40px', marginTop: '18px', padding: '0 18px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span>✓ Absen Masuk</span>
+                  </button>
+                  <button 
+                    type="button" 
+                    className="btn btn-secondary" 
+                    style={{ height: '40px', marginTop: '18px', fontSize: '0.85rem' }}
+                    onClick={() => setIsTodayAttendanceOpen(true)}
+                  >
+                    📋 Log Hari Ini ({todayAttendanceList.length})
+                  </button>
+                </form>
+
+                {/* Alert Notification Popup */}
+                {checkInAlert && (
+                  <div style={{
+                    marginTop: '12px',
+                    padding: '12px 16px',
+                    borderRadius: '10px',
+                    backgroundColor: checkInAlert.type === 'success' ? 'var(--success-bg)' : checkInAlert.type === 'warning' ? 'var(--warning-bg)' : 'var(--danger-bg)',
+                    border: `1px solid ${checkInAlert.type === 'success' ? 'var(--success)' : checkInAlert.type === 'warning' ? 'var(--warning)' : 'var(--danger)'}`,
+                    color: 'var(--text-primary)',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                  }}>
+                    <div>
+                      <strong style={{ color: checkInAlert.type === 'success' ? 'var(--success)' : checkInAlert.type === 'warning' ? 'var(--warning)' : 'var(--danger)' }}>
+                        {checkInAlert.title}
+                      </strong>
+                      <div style={{ fontSize: '0.9rem', marginTop: '2px' }}>{checkInAlert.message}</div>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '2px' }}>{checkInAlert.details}</div>
+                    </div>
+                    <button 
+                      onClick={() => setCheckInAlert(null)} 
+                      style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '1.1rem' }}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                )}
               </div>
-            </div>
-            <div className="table-container">
-              <table>
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Nama</th>
-                    <th>Telepon</th>
-                    <th>Paket</th>
-                    <th>Mulai</th>
-                    <th>Berakhir</th>
-                    <th>Status</th>
-                    <th>Aksi</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {members.filter(m => {
-                    const matchesSearch = m.name.toLowerCase().includes(memberSearch.toLowerCase()) || m.phone.includes(memberSearch);
-                    const status = getStatus(m.endDate);
-                    const matchesFilter = memberFilterStatus === 'all' || status === memberFilterStatus;
-                    return matchesSearch && matchesFilter;
-                  }).length === 0 ? (
-                    <tr>
-                      <td colSpan="8" style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>
-                        Data member tidak ditemukan.
-                      </td>
-                    </tr>
-                  ) : (
-                    members.filter(m => {
-                      const matchesSearch = m.name.toLowerCase().includes(memberSearch.toLowerCase()) || m.phone.includes(memberSearch);
-                      const status = getStatus(m.endDate);
-                      const matchesFilter = memberFilterStatus === 'all' || status === memberFilterStatus;
-                      return matchesSearch && matchesFilter;
-                    }).map(m => {
-                      const pkgName = packages.find(p => p.id === m.packageId)?.name || 'Paket Kustom';
-                      const status = getStatus(m.endDate);
-                      return (
-                        <tr key={m.id}>
-                          <td><code>{m.id}</code></td>
-                          <td><strong>{m.name}</strong></td>
-                          <td>{m.phone}</td>
-                          <td>{pkgName}</td>
-                          <td>{m.startDate}</td>
-                          <td>{m.endDate}</td>
-                          <td>
-                            <span className={`badge ${status === 'Active' ? 'badge-active' : 'badge-expired'}`}>
-                              {status === 'Active' ? 'Aktif' : 'Expired'}
-                            </span>
-                          </td>
-                          <td>
-                            <button className="action-btn" onClick={() => handleOpenEditMember(m)} title="Edit">
-                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                            </button>
-                            <button className="action-btn delete" onClick={() => handleDeleteMember(m.id)} title="Hapus">
-                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                            </button>
+
+              {/* Members Table Card */}
+              <div className="card-table-wrapper">
+                <div className="table-header" style={{ flexWrap: 'wrap', gap: '12px' }}>
+                  <div className="table-search" style={{ flex: '1 1 300px' }}>
+                    <input 
+                      type="text" 
+                      className="search-input" 
+                      placeholder="Cari member (Nama, ID: MBR-..., Telepon)..."
+                      value={memberSearch}
+                      onChange={(e) => {
+                        setMemberSearch(e.target.value);
+                        setMemberPage(1);
+                      }}
+                    />
+                    <select 
+                      className="select-input" 
+                      style={{ maxWidth: '150px' }}
+                      value={memberFilterStatus}
+                      onChange={(e) => {
+                        setMemberFilterStatus(e.target.value);
+                        setMemberPage(1);
+                      }}
+                    >
+                      <option value="all">Semua Status</option>
+                      <option value="Active">Aktif</option>
+                      <option value="Expired">Expired</option>
+                    </select>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                      <span>Baris:</span>
+                      <select 
+                        className="select-input" 
+                        style={{ padding: '6px 8px', fontSize: '0.85rem', width: 'auto' }}
+                        value={memberPageSize}
+                        onChange={(e) => {
+                          setMemberPageSize(Number(e.target.value));
+                          setMemberPage(1);
+                        }}
+                      >
+                        <option value={25}>25</option>
+                        <option value={50}>50</option>
+                        <option value={100}>100</option>
+                        <option value={200}>200</option>
+                      </select>
+                    </div>
+                    <button 
+                      className="btn btn-secondary" 
+                      style={{ fontSize: '0.8rem', padding: '6px 12px' }}
+                      onClick={handleReloadElfasData}
+                      title="Muat Ulang 2.110 Data Member Elfas Fitness"
+                    >
+                      🔄 Sinkron Data Elfas ({extractedMembers.length})
+                    </button>
+                  </div>
+                </div>
+
+                <div className="table-container">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Nama Member</th>
+                        <th>Telepon</th>
+                        <th>Paket</th>
+                        <th>Tgl Mulai</th>
+                        <th>Tgl Expired</th>
+                        <th>Kehadiran</th>
+                        <th>Status</th>
+                        <th style={{ textAlign: 'center' }}>Aksi & Absensi</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {paginatedList.length === 0 ? (
+                        <tr>
+                          <td colSpan="9" style={{ textAlign: 'center', padding: '32px', color: 'var(--text-secondary)' }}>
+                            Data member tidak ditemukan.
                           </td>
                         </tr>
-                      );
-                    })
+                      ) : (
+                        paginatedList.map(m => {
+                          const pkgName = packages.find(p => p.id === m.packageId)?.name || 'Bulanan Regular';
+                          const status = getStatus(m.endDate);
+                          return (
+                            <tr key={m.id}>
+                              <td><code>{m.id}</code></td>
+                              <td><strong>{m.name}</strong></td>
+                              <td>{m.phone}</td>
+                              <td>{pkgName}</td>
+                              <td>{m.startDate}</td>
+                              <td>{m.endDate}</td>
+                              <td>
+                                <span style={{ fontWeight: '600', color: m.totalVisits > 0 ? 'var(--accent)' : 'var(--text-muted)' }}>
+                                  {m.totalVisits || 0}x
+                                </span>
+                              </td>
+                              <td>
+                                <span className={`badge ${status === 'Active' ? 'badge-active' : 'badge-expired'}`}>
+                                  {status === 'Active' ? 'Aktif' : 'Expired'}
+                                </span>
+                              </td>
+                              <td>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', flexWrap: 'nowrap' }}>
+                                  {/* Quick Check-in Button */}
+                                  <button 
+                                    className="btn btn-primary" 
+                                    style={{ padding: '4px 8px', fontSize: '0.75rem', borderRadius: '6px', background: 'var(--success)', border: 'none', whiteSpace: 'nowrap' }}
+                                    onClick={() => handleCheckInMember(m)}
+                                    title={`Absen Masuk ${m.name}`}
+                                  >
+                                    ✓ Absen
+                                  </button>
+
+                                  {/* Renewal Button */}
+                                  <button 
+                                    className="btn btn-secondary" 
+                                    style={{ padding: '4px 8px', fontSize: '0.75rem', borderRadius: '6px', color: 'var(--accent)', borderColor: 'rgba(0, 242, 254, 0.3)', whiteSpace: 'nowrap' }}
+                                    onClick={() => handleOpenRenewMember(m)}
+                                    title={`Perpanjang Membership ${m.name}`}
+                                  >
+                                    🔄 Perpanjang
+                                  </button>
+
+                                  <button className="action-btn" onClick={() => handleOpenEditMember(m)} title="Edit Profil Member">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                  </button>
+                                  <button className="action-btn delete" onClick={() => handleDeleteMember(m.id)} title="Hapus Member">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Pagination Footer */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 0 8px 0', borderTop: '1px solid var(--border-color)', marginTop: '16px', flexWrap: 'wrap', gap: '12px' }}>
+                  <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                    Menampilkan <strong>{filteredMembers.length === 0 ? 0 : startIndex + 1}</strong> - <strong>{Math.min(startIndex + memberPageSize, filteredMembers.length)}</strong> dari <strong>{filteredMembers.length}</strong> member
+                  </div>
+
+                  {totalPages > 1 && (
+                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                      <button 
+                        className="btn btn-secondary" 
+                        style={{ padding: '6px 10px', fontSize: '0.8rem' }}
+                        disabled={safePage <= 1}
+                        onClick={() => setMemberPage(prev => Math.max(1, prev - 1))}
+                      >
+                        ◀ Prev
+                      </button>
+                      
+                      <span style={{ fontSize: '0.85rem', color: 'var(--text-primary)', padding: '0 8px' }}>
+                        Hal <strong>{safePage}</strong> / <strong>{totalPages}</strong>
+                      </span>
+
+                      <button 
+                        className="btn btn-secondary" 
+                        style={{ padding: '6px 10px', fontSize: '0.8rem' }}
+                        disabled={safePage >= totalPages}
+                        onClick={() => setMemberPage(prev => Math.min(totalPages, prev + 1))}
+                      >
+                        Next ▶
+                      </button>
+                    </div>
                   )}
-                </tbody>
-              </table>
+                </div>
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* DAILY VISITORS TAB */}
         {activeTab === 'daily_visitors' && (
@@ -1464,8 +2094,23 @@ export default function App() {
         {/* TRANSACTIONS TAB */}
         {activeTab === 'transactions' && (
           <div className="card-table-wrapper">
-            <div className="table-header">
-              <h2>Riwayat Transaksi</h2>
+            <div className="table-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+              <div>
+                <h2>Riwayat Transaksi</h2>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '2px' }}>
+                  Total: <strong>{transactions.length}</strong> transaksi ({formatRupiah(totalRevenue)})
+                </p>
+              </div>
+              {transactions.length > 0 && (
+                <button 
+                  className="btn btn-secondary" 
+                  style={{ color: 'var(--danger)', borderColor: 'var(--danger-bg)', fontSize: '0.8rem', padding: '6px 12px' }}
+                  onClick={handleClearAllTransactions}
+                  title="Hapus seluruh riwayat transaksi"
+                >
+                  🗑️ Reset Semua Transaksi
+                </button>
+              )}
             </div>
             <div className="table-container">
               <table>
@@ -1478,13 +2123,15 @@ export default function App() {
                     <th>Tanggal Bayar</th>
                     <th>Metode</th>
                     <th>Jumlah Pembayaran</th>
+                    <th style={{ textAlign: 'center' }}>Aksi</th>
                   </tr>
                 </thead>
                 <tbody>
                   {[...transactions].reverse().length === 0 ? (
                     <tr>
-                      <td colSpan="7" style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>
-                        Belum ada transaksi terekam.
+                      <td colSpan="8" style={{ textAlign: 'center', padding: '36px', color: 'var(--text-secondary)' }}>
+                        <div style={{ fontSize: '1.8rem', marginBottom: '8px' }}>💳</div>
+                        Belum ada transaksi terekam. Kasir siap digunakan untuk transaksi baru!
                       </td>
                     </tr>
                   ) : (
@@ -1505,6 +2152,16 @@ export default function App() {
                           </span>
                         </td>
                         <td><strong style={{ color: 'var(--success)' }}>{formatRupiah(t.amount)}</strong></td>
+                        <td style={{ textAlign: 'center' }}>
+                          <button 
+                            className="action-btn delete" 
+                            style={{ padding: '4px 6px' }}
+                            onClick={() => handleDeleteTransaction(t.id)} 
+                            title="Hapus Transaksi"
+                          >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                          </button>
+                        </td>
                       </tr>
                     ))
                   )}
@@ -1948,7 +2605,14 @@ export default function App() {
                   <select 
                     className="form-control"
                     value={memberForm.packageId}
-                    onChange={(e) => setMemberForm(prev => ({ ...prev, packageId: e.target.value }))}
+                    onChange={(e) => {
+                      const pkgId = e.target.value;
+                      const pkg = packages.find(p => p.id === pkgId);
+                      const dur = pkg ? pkg.duration : 1;
+                      const d = new Date(memberForm.startDate || new Date());
+                      d.setMonth(d.getMonth() + dur);
+                      setMemberForm(prev => ({ ...prev, packageId: pkgId, endDate: d.toISOString().split('T')[0] }));
+                    }}
                     required
                   >
                     {packages.map(p => (
@@ -1958,32 +2622,167 @@ export default function App() {
                     ))}
                   </select>
                 </div>
-                <div className="form-group">
-                  <label>Tanggal Mulai</label>
-                  <input 
-                    type="date" 
-                    className="form-control" 
-                    value={memberForm.startDate}
-                    onChange={(e) => setMemberForm(prev => ({ ...prev, startDate: e.target.value }))}
-                    required 
-                  />
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                   <div className="form-group">
-                   <label>Metode Pembayaran</label>
-                   <select 
-                     className="form-control"
-                     value={memberForm.paymentMethod}
-                     onChange={(e) => setMemberForm(prev => ({ ...prev, paymentMethod: e.target.value }))}
-                     required
-                   >
-                     <option value="Cash">Cash / Tunai</option>
-                     <option value="QRIS">QRIS</option>
-                   </select>
-                 </div>
-               </div>
+                    <label>Tanggal Mulai</label>
+                    <input 
+                      type="date" 
+                      className="form-control" 
+                      value={memberForm.startDate}
+                      onChange={(e) => {
+                        const newStart = e.target.value;
+                        const pkg = packages.find(p => p.id === memberForm.packageId);
+                        const dur = pkg ? pkg.duration : 1;
+                        const d = new Date(newStart);
+                        d.setMonth(d.getMonth() + dur);
+                        setMemberForm(prev => ({ ...prev, startDate: newStart, endDate: d.toISOString().split('T')[0] }));
+                      }}
+                      required 
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Tanggal Berakhir (Expired)</label>
+                    <input 
+                      type="date" 
+                      className="form-control" 
+                      value={memberForm.endDate}
+                      onChange={(e) => setMemberForm(prev => ({ ...prev, endDate: e.target.value }))}
+                      required 
+                    />
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label>Metode Pembayaran</label>
+                  <select 
+                    className="form-control"
+                    value={memberForm.paymentMethod}
+                    onChange={(e) => setMemberForm(prev => ({ ...prev, paymentMethod: e.target.value }))}
+                    required
+                  >
+                    <option value="Cash">Cash / Tunai</option>
+                    <option value="QRIS">QRIS</option>
+                  </select>
+                </div>
               </div>
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={() => setIsMemberModalOpen(false)}>Batal</button>
-                <button type="submit" className="btn className=btn-primary">Simpan Member</button>
+                <button type="submit" className="btn btn-primary">Simpan Member</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MEMBERSHIP RENEWAL MODAL */}
+      {isRenewModalOpen && (
+        <div className="modal" onClick={() => setIsRenewModalOpen(false)}>
+          <div className="modal-content" style={{ maxWidth: '520px' }} onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <div>
+                <h3>🔄 Perpanjang Membership</h3>
+                <p style={{ color: 'var(--accent)', fontSize: '0.9rem', marginTop: '2px', fontWeight: '600' }}>
+                  {renewForm.memberName} ({renewForm.memberId})
+                </p>
+              </div>
+              <button className="modal-close" onClick={() => setIsRenewModalOpen(false)}>&times;</button>
+            </div>
+            <form onSubmit={handleSaveRenew}>
+              <div className="modal-body">
+                <div className="form-group">
+                  <label>Pilih Paket Perpanjangan</label>
+                  <select 
+                    className="form-control"
+                    value={renewForm.packageId}
+                    onChange={(e) => {
+                      const pkgId = e.target.value;
+                      const pkg = packages.find(p => p.id === pkgId);
+                      const dur = pkg ? pkg.duration : 1;
+                      const d = new Date(renewForm.renewStartDate);
+                      d.setMonth(d.getMonth() + dur);
+                      setRenewForm(prev => ({
+                        ...prev,
+                        packageId: pkgId,
+                        renewEndDate: d.toISOString().split('T')[0]
+                      }));
+                    }}
+                    required
+                  >
+                    {packages.map(p => (
+                      <option key={p.id} value={p.id}>
+                        {p.name} — {p.duration} Bulan ({formatRupiah(p.price)})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                  <div className="form-group">
+                    <label>Mulai Perpanjangan</label>
+                    <input 
+                      type="date" 
+                      className="form-control" 
+                      value={renewForm.renewStartDate}
+                      onChange={(e) => {
+                        const newStart = e.target.value;
+                        const pkg = packages.find(p => p.id === renewForm.packageId);
+                        const dur = pkg ? pkg.duration : 1;
+                        const d = new Date(newStart);
+                        d.setMonth(d.getMonth() + dur);
+                        setRenewForm(prev => ({
+                          ...prev,
+                          renewStartDate: newStart,
+                          renewEndDate: d.toISOString().split('T')[0]
+                        }));
+                      }}
+                      required 
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Masa Aktif Baru (Expired)</label>
+                    <input 
+                      type="date" 
+                      className="form-control" 
+                      value={renewForm.renewEndDate}
+                      onChange={(e) => setRenewForm(prev => ({ ...prev, renewEndDate: e.target.value }))}
+                      required 
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label>Metode Pembayaran</label>
+                  <select 
+                    className="form-control"
+                    value={renewForm.paymentMethod}
+                    onChange={(e) => setRenewForm(prev => ({ ...prev, paymentMethod: e.target.value }))}
+                    required
+                  >
+                    <option value="Cash">Cash (Tunai)</option>
+                    <option value="QRIS">QRIS / Transfer</option>
+                  </select>
+                </div>
+
+                {/* Bill Summary */}
+                {(() => {
+                  const selPkg = packages.find(p => p.id === renewForm.packageId);
+                  return (
+                    <div style={{ padding: '14px', backgroundColor: 'var(--bg-tertiary)', borderRadius: '10px', border: '1px solid var(--border-color)', marginTop: '8px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Total Biaya Membership:</span>
+                        <strong style={{ fontSize: '1.15rem', color: 'var(--accent)' }}>
+                          {formatRupiah(selPkg ? selPkg.price : 0)}
+                        </strong>
+                      </div>
+                      <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>
+                        💡 Transaksi pembayaran akan otomatis tercatat di laporan kasir dan omzet.
+                      </p>
+                    </div>
+                  );
+                })()}
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" onClick={() => setIsRenewModalOpen(false)}>Batal</button>
+                <button type="submit" className="btn btn-primary">✓ Proses Perpanjangan</button>
               </div>
             </form>
           </div>
@@ -2217,6 +3016,80 @@ export default function App() {
                 <button type="submit" className="btn btn-primary">Simpan Pengeluaran</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* TODAY ATTENDANCE LOG MODAL */}
+      {isTodayAttendanceOpen && (
+        <div className="modal" onClick={() => setIsTodayAttendanceOpen(false)}>
+          <div className="modal-content" style={{ maxWidth: '680px' }} onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <div>
+                <h3>📋 Log Kehadiran Member Hari Ini</h3>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '2px' }}>
+                  {new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })} • <strong>{todayAttendanceList.length} Member</strong> Hadir
+                </p>
+              </div>
+              <button className="modal-close" onClick={() => setIsTodayAttendanceOpen(false)}>&times;</button>
+            </div>
+            
+            <div className="modal-body" style={{ maxHeight: '420px', overflowY: 'auto' }}>
+              {todayAttendanceList.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '36px', color: 'var(--text-muted)' }}>
+                  <div style={{ fontSize: '2rem', marginBottom: '8px' }}>🏋️‍♂️</div>
+                  Belum ada member yang check-in / absen hari ini.<br />
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Ketik ID member di kolom Quick Check-In atau klik tombol "✓ Absen" di daftar member.</span>
+                </div>
+              ) : (
+                <table style={{ width: '100%', fontSize: '0.85rem' }}>
+                  <thead>
+                    <tr>
+                      <th>Jam</th>
+                      <th>ID</th>
+                      <th>Nama Member</th>
+                      <th>Kehadiran Ke-</th>
+                      <th>Status</th>
+                      <th style={{ textAlign: 'center' }}>Batal</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {todayAttendanceList.map(log => (
+                      <tr key={log.id}>
+                        <td><code>{log.time}</code></td>
+                        <td><code>{log.memberId}</code></td>
+                        <td><strong>{log.memberName}</strong></td>
+                        <td><span style={{ color: 'var(--accent)', fontWeight: '600' }}>{log.visitNumber}x</span></td>
+                        <td>
+                          <span className={`badge ${log.statusAtCheckIn === 'Active' ? 'badge-active' : 'badge-expired'}`}>
+                            {log.statusAtCheckIn === 'Active' ? 'Aktif' : 'Expired'}
+                          </span>
+                        </td>
+                        <td style={{ textAlign: 'center' }}>
+                          <button 
+                            className="action-btn delete" 
+                            style={{ padding: '2px 6px' }}
+                            onClick={() => handleDeleteAttendanceLog(log.id, log.memberId)}
+                            title="Batalkan Absen"
+                          >
+                            ✕
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+
+            <div className="modal-footer" style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                Total kumulatif check-in tersimpan aman di sistem.
+              </span>
+              <button type="button" className="btn btn-primary" onClick={() => setIsTodayAttendanceOpen(false)}>
+                Tutup
+              </button>
+            </div>
           </div>
         </div>
       )}
