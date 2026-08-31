@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import extractedMembers from './extracted_members.json';
 import gymLogo from './assets/logo.jpg';
+import * as db from './neonDb';
 
 // Default Packages
 const defaultPackages = [
@@ -182,6 +183,38 @@ export default function App() {
       localStorage.setItem('gymfit_auth_user', JSON.stringify(user));
     }
   };
+
+  // Cloud Realtime State
+  const [cloudSyncStatus, setCloudSyncStatus] = useState('syncing'); // syncing, connected, offline
+
+  // Load data from Neon Postgres Cloud & auto-refresh
+  const refreshCloudData = async () => {
+    try {
+      const data = await db.fetchAllData();
+      if (data) {
+        if (data.members && data.members.length > 0) setMembers(data.members);
+        if (data.transactions) setTransactions(data.transactions);
+        if (data.attendanceLogs) setAttendanceLogs(data.attendanceLogs);
+        if (data.expenses) setExpenses(data.expenses);
+        if (data.dailyVisitors) setDailyVisitors(data.dailyVisitors);
+        setCloudSyncStatus('connected');
+      }
+    } catch (err) {
+      console.warn('Neon Postgres sync notice:', err);
+      setCloudSyncStatus('offline');
+    }
+  };
+
+  useEffect(() => {
+    refreshCloudData();
+    
+    // Auto-poll every 6 seconds for multi-device live sync
+    const interval = setInterval(() => {
+      refreshCloudData();
+    }, 6000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   // Search & Filter States
   const [memberSearch, setMemberSearch] = useState('');
@@ -441,15 +474,16 @@ export default function App() {
 
     if (memberForm.id) {
       // Edit
-      setMembers(prev => prev.map(m => m.id === memberForm.id ? {
-        ...m,
+      const updatedM = {
         name: memberForm.name,
         phone: memberForm.phone,
         packageId: memberForm.packageId,
         startDate: memberForm.startDate,
         endDate: finalEndDate,
         paymentMethod: memberForm.paymentMethod
-      } : m));
+      };
+      setMembers(prev => prev.map(m => m.id === memberForm.id ? { ...m, ...updatedM } : m));
+      db.saveMember({ id: memberForm.id, ...updatedM });
     } else {
       // Add New Member
       const nextNum = members.length + 1;
@@ -466,11 +500,12 @@ export default function App() {
         paymentMethod: memberForm.paymentMethod
       };
       setMembers(prev => [newMember, ...prev]);
+      db.saveMember(newMember);
 
       // Record initial membership transaction
       if (selectedPkg) {
         const txId = `TX-${Date.now().toString().slice(-6)}`;
-        setTransactions(prev => [{
+        const newTx = {
           id: txId,
           memberName: memberForm.name,
           type: 'Membership',
@@ -478,7 +513,9 @@ export default function App() {
           date: memberForm.startDate,
           amount: selectedPkg.price,
           paymentMethod: memberForm.paymentMethod
-        }, ...prev]);
+        };
+        setTransactions(prev => [newTx, ...prev]);
+        db.saveTransaction(newTx);
       }
     }
     setIsMemberModalOpen(false);
@@ -487,6 +524,7 @@ export default function App() {
   const handleDeleteMember = (id) => {
     if (window.confirm('Apakah Anda yakin ingin menghapus member ini?')) {
       setMembers(prev => prev.filter(m => m.id !== id));
+      db.deleteMember(id);
     }
   };
 
@@ -530,18 +568,20 @@ export default function App() {
 
     const oldMember = members.find(m => m.id === renewForm.memberId);
 
-    // Update Member dates and package
-    setMembers(prev => prev.map(m => m.id === renewForm.memberId ? {
-      ...m,
+    const updatedRenewData = {
       packageId: renewForm.packageId,
       startDate: renewForm.renewStartDate,
       endDate: finalEndDate,
-      historyCount: (m.historyCount || 0) + 1
-    } : m));
+      historyCount: (oldMember?.historyCount || 0) + 1
+    };
+
+    // Update Member dates and package
+    setMembers(prev => prev.map(m => m.id === renewForm.memberId ? { ...m, ...updatedRenewData } : m));
+    db.saveMember({ id: renewForm.memberId, ...updatedRenewData });
 
     // Record renewal transaction in cashier (with rollback snapshot)
     const txId = `TX-${Date.now().toString().slice(-6)}`;
-    setTransactions(prev => [{
+    const newRenewTx = {
       id: txId,
       memberId: renewForm.memberId,
       memberName: renewForm.memberName,
@@ -553,7 +593,9 @@ export default function App() {
       previousEndDate: oldMember?.endDate || '',
       previousStartDate: oldMember?.startDate || '',
       previousPackageId: oldMember?.packageId || ''
-    }, ...prev]);
+    };
+    setTransactions(prev => [newRenewTx, ...prev]);
+    db.saveTransaction(newRenewTx);
 
     setIsRenewModalOpen(false);
 
@@ -771,9 +813,11 @@ export default function App() {
       
       setDailyVisitors(prev => [...prev, newVisitor]);
 
+      db.saveDailyVisitor(newVisitor);
+
       // Record Transaction
       const txId = `TX-${Date.now().toString().slice(-6)}`;
-      setTransactions(prev => [...prev, {
+      const newDlyTx = {
         id: txId,
         memberName: dailyForm.name,
         type: 'Kunjungan Harian',
@@ -781,7 +825,9 @@ export default function App() {
         date: dailyForm.date,
         amount: parseInt(dailyForm.amountPaid),
         paymentMethod: dailyForm.paymentMethod
-      }]);
+      };
+      setTransactions(prev => [newDlyTx, ...prev]);
+      db.saveTransaction(newDlyTx);
     }
 
     setIsDailyModalOpen(false);
@@ -874,13 +920,15 @@ export default function App() {
     } else {
       // Add New
       const newId = `EXP-${Date.now().toString().slice(-6)}`;
-      setExpenses(prev => [...prev, {
+      const newExp = {
         id: newId,
         date: expenseForm.date,
         desc: expenseForm.desc,
         amount: parseInt(expenseForm.amount),
         paymentMethod: expenseForm.paymentMethod
-      }]);
+      };
+      setExpenses(prev => [newExp, ...prev]);
+      db.saveExpense(newExp);
     }
     setIsExpenseModalOpen(false);
   };
@@ -888,6 +936,7 @@ export default function App() {
   const handleDeleteExpense = (id) => {
     if (window.confirm('Apakah Anda yakin ingin menghapus data pengeluaran ini?')) {
       setExpenses(prev => prev.filter(exp => exp.id !== id));
+      db.deleteExpense(id);
     }
   };
 
@@ -900,14 +949,19 @@ export default function App() {
         `Hapus transaksi perpanjangan ini dan kembalikan masa aktif member "${tx.memberName}" ke tanggal sebelumnya (${tx.previousEndDate})?`
       );
       if (confirmRollback) {
+        const rollbackData = {
+          packageId: tx.previousPackageId,
+          startDate: tx.previousStartDate,
+          endDate: tx.previousEndDate
+        };
         setMembers(prev => prev.map(m => m.id === tx.memberId ? {
           ...m,
-          packageId: tx.previousPackageId || m.packageId,
-          startDate: tx.previousStartDate || m.startDate,
-          endDate: tx.previousEndDate,
+          ...rollbackData,
           historyCount: Math.max(0, (m.historyCount || 1) - 1)
         } : m));
+        db.saveMember({ id: tx.memberId, ...rollbackData });
         setTransactions(prev => prev.filter(t => t.id !== id));
+        db.deleteTransaction(id);
         setCheckInAlert({
           type: 'warning',
           title: `↩️ Perpanjangan Dibatalkan`,
@@ -985,7 +1039,7 @@ export default function App() {
 
     // Record Transaction
     const txId = `TX-${Date.now().toString().slice(-6)}`;
-    setTransactions(prev => [...prev, {
+    const storeTx = {
       id: txId,
       memberName: buyerName,
       type: 'Toko',
@@ -993,7 +1047,9 @@ export default function App() {
       date: new Date().toISOString().split('T')[0],
       amount: total,
       paymentMethod: storePaymentMethod
-    }]);
+    };
+    setTransactions(prev => [storeTx, ...prev]);
+    db.saveTransaction(storeTx);
 
     // Reset Cart
     setCart({});
@@ -1275,6 +1331,21 @@ export default function App() {
             </button>
           </li>
         </ul>
+
+        {/* Cloud Database Status Indicator */}
+        <div style={{ padding: '8px 16px', borderTop: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem' }}>
+          <span style={{ color: 'var(--text-muted)' }}>Database Cloud:</span>
+          <span style={{ 
+            color: cloudSyncStatus === 'connected' ? 'var(--success)' : cloudSyncStatus === 'syncing' ? 'var(--accent)' : 'var(--warning)',
+            fontWeight: '600',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '5px'
+          }}>
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: cloudSyncStatus === 'connected' ? 'var(--success)' : cloudSyncStatus === 'syncing' ? 'var(--accent)' : 'var(--warning)', display: 'inline-block' }}></span>
+            {cloudSyncStatus === 'connected' ? 'Live Realtime' : cloudSyncStatus === 'syncing' ? 'Sinkronisasi...' : 'Lokal Mode'}
+          </span>
+        </div>
 
         {/* User Profile & Logout on Sidebar */}
         <div className="user-profile-sidebar">
@@ -1638,13 +1709,25 @@ export default function App() {
           const startIndex = (safePage - 1) * memberPageSize;
           const paginatedList = filteredMembers.slice(startIndex, startIndex + memberPageSize);
 
-          const handleReloadElfasData = () => {
-            if (window.confirm(`Muat ulang seluruh ${extractedMembers.length} data member dari Elfas Fitness?`)) {
-              setMembers(extractedMembers);
-              localStorage.setItem('gymfit_members', JSON.stringify(extractedMembers));
-              alert(`Berhasil memuat ${extractedMembers.length} data member!`);
-            }
-          };
+          const handleReloadElfasData = async () => {
+    if (window.confirm(`Muat ulang dan sinkronkan master (${extractedMembers.length} member) ke Vercel Neon Database?`)) {
+      setMembers(extractedMembers);
+      localStorage.setItem('gymfit_members', JSON.stringify(extractedMembers));
+      setMemberPage(1);
+      
+      try {
+        setCloudSyncStatus('syncing');
+        for (const m of extractedMembers) {
+          await db.saveMember(m);
+        }
+        setCloudSyncStatus('connected');
+        alert('🎉 2.110 Member berhasil disinkronkan ke Vercel Postgres Database!');
+      } catch (e) {
+        console.error(e);
+        alert('Gagal sinkron. Periksa koneksi internet.');
+      }
+    }
+  };
 
           return (
             <div>
