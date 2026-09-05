@@ -3035,12 +3035,12 @@ export default function App() {
               )}
             </div>
 
-            {/* 4 Core Financial & Executive Stats Cards */}
+            {/* 6 Executive & Operational Stats Cards */}
             <div className="grid-stats" style={{ marginBottom: '24px' }}>
-              {/* Card 1: Omzet Kotor */}
+              {/* Card 1: Omzet Periode Ini */}
               <div className="card-stat">
                 <div className="stat-info">
-                  <p>Total Pemasukan (Omzet Kotor)</p>
+                  <p>Omzet Periode Ini (Pemasukan)</p>
                   <h3 style={{ color: 'var(--accent)' }}>{formatRupiah(periodRevenue)}</h3>
                   <div className="stat-breakdown-tags">
                     <span className="stat-tag success">Member: {formatRupiah(periodMembershipRev)}</span>
@@ -3053,13 +3053,13 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Card 2: Pengeluaran (Beban Biaya) */}
+              {/* Card 2: Pengeluaran Periode Ini */}
               <div className="card-stat">
                 <div className="stat-info">
-                  <p>Total Pengeluaran (Beban Operasional)</p>
+                  <p>Total Pengeluaran (Beban)</p>
                   <h3 style={{ color: 'var(--danger)' }}>-{formatRupiah(periodExpenses)}</h3>
                   <div className="stat-breakdown-tags">
-                    <span className="stat-tag danger">{filteredExpenses.length} Pengeluaran</span>
+                    <span className="stat-tag danger">{filteredExpenses.length} Biaya</span>
                     <span className="stat-tag">Cash: {formatRupiah(periodCashExpenses)}</span>
                     <span className="stat-tag">Transfer: {formatRupiah(periodNonCashExpenses)}</span>
                   </div>
@@ -3069,19 +3069,19 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Card 3: Keuntungan Bersih (Omzet Bersih / Laba) */}
+              {/* Card 3: Pendapatan Bersih (Omzet - Pengeluaran) */}
               <div className="card-stat">
                 <div className="stat-info">
-                  <p>Keuntungan Bersih (Omzet Bersih)</p>
+                  <p>Pendapatan Bersih (Laba Bersih)</p>
                   <h3 style={{ color: periodNetProfit >= 0 ? 'var(--success)' : 'var(--danger)' }}>
                     {formatRupiah(periodNetProfit)}
                   </h3>
                   <div className="stat-breakdown-tags">
                     <span className={`stat-tag ${periodNetProfit >= 0 ? 'success' : 'danger'}`}>
-                      Margin Bersih: {profitMarginPercent}%
+                      Margin: {profitMarginPercent}%
                     </span>
                     <span className="stat-tag">
-                      {periodNetProfit >= 0 ? 'Surplus / Profit ✅' : 'Defisit Operasional ⚠️'}
+                      {periodNetProfit >= 0 ? 'Surplus Laba ✅' : 'Defisit Operasional ⚠️'}
                     </span>
                   </div>
                 </div>
@@ -3090,19 +3090,48 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Card 4: Arus Kas & Volume Bisnis */}
+              {/* Card 4: Volume Transaksi */}
               <div className="card-stat">
                 <div className="stat-info">
-                  <p>Arus Kas & Tamu Periode Ini</p>
-                  <h3>{filteredTransactions.length} <span style={{ fontSize: '1rem', fontWeight: 'normal', color: 'var(--text-secondary)' }}>transaksi</span></h3>
+                  <p>Volume Transaksi</p>
+                  <h3>{filteredTransactions.length} <span style={{ fontSize: '1rem', fontWeight: 'normal', color: 'var(--text-secondary)' }}>Transaksi</span></h3>
                   <div className="stat-breakdown-tags">
                     <span className="stat-tag success">Cash: {formatRupiah(periodCash)}</span>
                     <span className="stat-tag accent">QRIS: {formatRupiah(periodQRIS)}</span>
-                    <span className="stat-tag warning">+{periodNewMembers} Mbr | {periodDailyCount} Visit</span>
+                  </div>
+                </div>
+                <div className="stat-icon green">
+                  <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                </div>
+              </div>
+
+              {/* Card 5: Member Baru Terdaftar */}
+              <div className="card-stat">
+                <div className="stat-info">
+                  <p>Member Baru Terdaftar</p>
+                  <h3>+{periodNewMembers} <span style={{ fontSize: '1rem', fontWeight: 'normal', color: 'var(--text-secondary)' }}>Member</span></h3>
+                  <div className="stat-breakdown-tags">
+                    <span className="stat-tag accent">Omset: {formatRupiah(periodMembershipRev)}</span>
+                    <span className="stat-tag success">Aktif: {activeMembersCount} member</span>
                   </div>
                 </div>
                 <div className="stat-icon blue">
-                  <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                </div>
+              </div>
+
+              {/* Card 6: Tamu Harian Masuk */}
+              <div className="card-stat">
+                <div className="stat-info">
+                  <p>Tamu Harian Masuk</p>
+                  <h3>{periodDailyCount} <span style={{ fontSize: '1rem', fontWeight: 'normal', color: 'var(--text-secondary)' }}>Kunjungan</span></h3>
+                  <div className="stat-breakdown-tags">
+                    <span className="stat-tag accent">Visit: {formatRupiah(periodDailyRev)}</span>
+                    <span className="stat-tag">Rata2: {periodDailyCount > 0 ? formatRupiah(Math.round(periodDailyRev / periodDailyCount)) : 'Rp 0'}/org</span>
+                  </div>
+                </div>
+                <div className="stat-icon warning">
+                  <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
                 </div>
               </div>
             </div>
