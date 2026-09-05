@@ -295,7 +295,7 @@ export default function App() {
   });
 
   // Overview Tab Filter State (All Time, specific month YYYY-MM, or custom range)
-  const [overviewFilter, setOverviewFilter] = useState('all'); // 'all', '2026-09', '2026-08', etc. or 'custom'
+  const [overviewFilter, setOverviewFilter] = useState('monthly'); // 'monthly', 'all', 'daily', 'weekly', 'yearly', '2026-09', etc. or 'custom'
   const [overviewCustomStart, setOverviewCustomStart] = useState(() => {
     const today = new Date();
     return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-01`;
@@ -383,6 +383,13 @@ export default function App() {
   const [buyerName, setBuyerName] = useState('');
 
   // Helpers
+  const formatLocalDateStr = (d) => {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const formatRupiah = (number) => {
     return new Intl.NumberFormat('id-ID', {
       style: 'currency',
@@ -461,6 +468,14 @@ export default function App() {
 
   const formatMonthLabel = (mStr) => {
     if (!mStr || mStr === 'all') return 'Semua Waktu';
+    if (mStr === 'daily' || mStr === 'today') return 'Hari Ini';
+    if (mStr === 'weekly') return '7 Hari Terakhir';
+    if (mStr === 'monthly') {
+      const today = new Date();
+      const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+      return `Bulan Ini (${monthNames[today.getMonth()]} ${today.getFullYear()})`;
+    }
+    if (mStr === 'yearly') return `Tahun Ini (${new Date().getFullYear()})`;
     if (mStr === 'custom') return `${overviewCustomStart} s/d ${overviewCustomEnd}`;
     const parts = mStr.split('-');
     if (parts.length < 2) return mStr;
@@ -475,11 +490,63 @@ export default function App() {
   // Overview Filter Check Helper
   const isDateInOverviewFilter = (dateStr) => {
     if (!dateStr) return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayStr = formatLocalDateStr(today);
+
     if (overviewFilter === 'all') return true;
+
+    if (overviewFilter === 'daily' || overviewFilter === 'today') {
+      return dateStr === todayStr;
+    }
+
+    if (overviewFilter === 'weekly') {
+      const oneWeekAgo = new Date(today);
+      oneWeekAgo.setDate(today.getDate() - 7);
+      const oneWeekAgoStr = formatLocalDateStr(oneWeekAgo);
+      return dateStr >= oneWeekAgoStr && dateStr <= todayStr;
+    }
+
+    if (overviewFilter === 'monthly') {
+      const currentMonthPrefix = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+      return dateStr.startsWith(currentMonthPrefix);
+    }
+
+    if (overviewFilter === 'yearly') {
+      const currentYear = `${today.getFullYear()}`;
+      return dateStr.startsWith(currentYear);
+    }
+
     if (overviewFilter === 'custom') {
       return dateStr >= overviewCustomStart && dateStr <= overviewCustomEnd;
     }
-    return dateStr.startsWith(overviewFilter);
+
+    if (overviewFilter.match(/^\d{4}-\d{2}$/)) {
+      return dateStr.startsWith(overviewFilter);
+    }
+
+    return true;
+  };
+
+  // Synchronized Filter Period Change Handlers for Overview & Chart
+  const handleOverviewPeriodChange = (period) => {
+    setOverviewFilter(period);
+    if (period === 'daily' || period === 'today') {
+      setChartPeriod('daily');
+    } else if (period === 'weekly') {
+      setChartPeriod('weekly');
+    } else if (period === 'monthly' || period.match(/^\d{4}-\d{2}$/)) {
+      setChartPeriod('monthly');
+    } else if (period === 'yearly' || period === 'all') {
+      setChartPeriod('yearly');
+    }
+    setHoveredPoint(null);
+  };
+
+  const handleChartPeriodChange = (period) => {
+    setChartPeriod(period);
+    setOverviewFilter(period);
+    setHoveredPoint(null);
   };
 
   // Filtered Overview Data Sets
@@ -1238,14 +1305,6 @@ export default function App() {
     alert('Checkout berhasil!');
   };
 
-  // Helper tanggal lokal YYYY-MM-DD aman dari pergeseran UTC
-  const formatLocalDateStr = (d) => {
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
-
   const { chartPoints, monthsLabel, maxVal } = (() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -1663,31 +1722,43 @@ export default function App() {
                 <div className="overview-filter-pills">
                   <button 
                     type="button"
-                    className={`overview-pill ${overviewFilter === 'all' ? 'active' : ''}`}
-                    onClick={() => setOverviewFilter('all')}
+                    className={`overview-pill ${overviewFilter === 'daily' ? 'active' : ''}`}
+                    onClick={() => handleOverviewPeriodChange('daily')}
                   >
-                    Semua Waktu
+                    ⚡ Hari Ini
                   </button>
                   <button 
                     type="button"
-                    className={`overview-pill ${overviewFilter === currentMonthStr ? 'active' : ''}`}
-                    onClick={() => setOverviewFilter(currentMonthStr)}
+                    className={`overview-pill ${overviewFilter === 'weekly' ? 'active' : ''}`}
+                    onClick={() => handleOverviewPeriodChange('weekly')}
                   >
-                    Bulan Ini ({formatMonthLabel(currentMonthStr)})
+                    📅 7 Hari Terakhir
                   </button>
-                  {availableMonths.find(m => m !== currentMonthStr) && (
-                    <button 
-                      type="button"
-                      className={`overview-pill ${overviewFilter === availableMonths.find(m => m !== currentMonthStr) ? 'active' : ''}`}
-                      onClick={() => setOverviewFilter(availableMonths.find(m => m !== currentMonthStr))}
-                    >
-                      Bulan Lalu ({formatMonthLabel(availableMonths.find(m => m !== currentMonthStr))})
-                    </button>
-                  )}
+                  <button 
+                    type="button"
+                    className={`overview-pill ${overviewFilter === 'monthly' ? 'active' : ''}`}
+                    onClick={() => handleOverviewPeriodChange('monthly')}
+                  >
+                    🗓️ Bulan Ini
+                  </button>
+                  <button 
+                    type="button"
+                    className={`overview-pill ${overviewFilter === 'yearly' ? 'active' : ''}`}
+                    onClick={() => handleOverviewPeriodChange('yearly')}
+                  >
+                    📊 Tahun Ini ({new Date().getFullYear()})
+                  </button>
+                  <button 
+                    type="button"
+                    className={`overview-pill ${overviewFilter === 'all' ? 'active' : ''}`}
+                    onClick={() => handleOverviewPeriodChange('all')}
+                  >
+                    🌐 Semua Waktu
+                  </button>
                   <button 
                     type="button"
                     className={`overview-pill ${overviewFilter === 'custom' ? 'active' : ''}`}
-                    onClick={() => setOverviewFilter('custom')}
+                    onClick={() => handleOverviewPeriodChange('custom')}
                   >
                     📆 Kustom Tanggal
                   </button>
@@ -1695,15 +1766,15 @@ export default function App() {
               </div>
 
               <div className="overview-dropdown-wrapper">
-                <label className="overview-dropdown-label">Pilih Bulan:</label>
+                <label className="overview-dropdown-label">Pilih Bulan Spesifik:</label>
                 <select 
                   className="overview-month-select"
-                  value={overviewFilter.startsWith('202') ? overviewFilter : ''}
+                  value={overviewFilter.match(/^\d{4}-\d{2}$/) ? overviewFilter : ''}
                   onChange={(e) => {
-                    if (e.target.value) setOverviewFilter(e.target.value);
+                    if (e.target.value) handleOverviewPeriodChange(e.target.value);
                   }}
                 >
-                  <option value="" disabled>-- Pilih Bulan Spesifik --</option>
+                  <option value="" disabled>-- Pilih Bulan (Jan - Sep) --</option>
                   {availableMonths.map(m => (
                     <option key={m} value={m}>
                       {formatMonthLabel(m)}
@@ -1750,7 +1821,7 @@ export default function App() {
                 <button 
                   type="button" 
                   className="btn-clear-filter"
-                  onClick={() => setOverviewFilter('all')}
+                  onClick={() => handleOverviewPeriodChange('all')}
                   title="Kembalikan ke Semua Waktu"
                 >
                   ✕ Reset Filter (Semua Waktu)
@@ -1762,13 +1833,13 @@ export default function App() {
             <div className="grid-stats">
               <div className="card-stat">
                 <div className="stat-info">
-                  <p>{overviewFilter === 'all' ? 'Member Hadir Hari Ini' : `Kunjungan Tamu (${overviewFilterLabel})`}</p>
+                  <p>{overviewFilter === 'all' || overviewFilter === 'daily' ? 'Member Hadir Hari Ini' : `Kunjungan Tamu (${overviewFilterLabel})`}</p>
                   <h3 style={{ color: 'var(--accent)' }}>
-                    {overviewFilter === 'all' ? todayAttendanceList.length : overviewVisitors.length}{' '}
+                    {overviewFilter === 'all' || overviewFilter === 'daily' ? todayAttendanceList.length : overviewVisitors.length}{' '}
                     <span style={{ fontSize: '1rem', fontWeight: 'normal', color: 'var(--text-secondary)' }}>orang</span>
                   </h3>
                   <div className="stat-breakdown-tags">
-                    {overviewFilter === 'all' ? (
+                    {overviewFilter === 'all' || overviewFilter === 'daily' ? (
                       <span className="stat-tag">Tamu Hari Ini: {dailyVisitors.filter(d => d.date === new Date().toISOString().split('T')[0]).length} org</span>
                     ) : (
                       <>
@@ -1910,7 +1981,7 @@ export default function App() {
                   <span>
                     {chartPeriod === 'daily' && 'Tren Pendapatan Harian (7 Hari Terakhir)'}
                     {chartPeriod === 'weekly' && 'Tren Pendapatan Mingguan (4 Minggu Terakhir)'}
-                    {chartPeriod === 'monthly' && `Tren Pendapatan Bulanan (${overviewFilter !== 'all' ? overviewFilterLabel : 'Bulan Ini'})`}
+                    {chartPeriod === 'monthly' && `Tren Pendapatan Bulanan (${overviewFilter !== 'all' && overviewFilter !== 'daily' && overviewFilter !== 'weekly' && overviewFilter !== 'yearly' ? overviewFilterLabel : 'Bulan Ini'})`}
                     {chartPeriod === 'yearly' && `Tren Pendapatan Tahunan (${new Date().getFullYear()})`}
                   </span>
                 </h3>
@@ -1918,26 +1989,26 @@ export default function App() {
                 {/* Modern Interactive Filter Pills */}
                 <div className="chart-filter-pills">
                   <button 
-                    className={`chart-filter-pill ${chartPeriod === 'daily' ? 'active' : ''}`}
-                    onClick={() => { setChartPeriod('daily'); setHoveredPoint(null); }} 
+                    className={`chart-filter-pill ${chartPeriod === 'daily' && overviewFilter === 'daily' ? 'active' : ''}`}
+                    onClick={() => handleChartPeriodChange('daily')} 
                   >
                     Harian
                   </button>
                   <button 
-                    className={`chart-filter-pill ${chartPeriod === 'weekly' ? 'active' : ''}`}
-                    onClick={() => { setChartPeriod('weekly'); setHoveredPoint(null); }} 
+                    className={`chart-filter-pill ${chartPeriod === 'weekly' && overviewFilter === 'weekly' ? 'active' : ''}`}
+                    onClick={() => handleChartPeriodChange('weekly')} 
                   >
                     Mingguan
                   </button>
                   <button 
-                    className={`chart-filter-pill ${chartPeriod === 'monthly' ? 'active' : ''}`}
-                    onClick={() => { setChartPeriod('monthly'); setHoveredPoint(null); }} 
+                    className={`chart-filter-pill ${(chartPeriod === 'monthly' || overviewFilter === 'monthly' || overviewFilter.match(/^\d{4}-\d{2}$/)) ? 'active' : ''}`}
+                    onClick={() => handleChartPeriodChange('monthly')} 
                   >
                     Bulanan
                   </button>
                   <button 
-                    className={`chart-filter-pill ${chartPeriod === 'yearly' ? 'active' : ''}`}
-                    onClick={() => { setChartPeriod('yearly'); setHoveredPoint(null); }} 
+                    className={`chart-filter-pill ${chartPeriod === 'yearly' && (overviewFilter === 'yearly' || overviewFilter === 'all') ? 'active' : ''}`}
+                    onClick={() => handleChartPeriodChange('yearly')} 
                   >
                     Tahunan
                   </button>
