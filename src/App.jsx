@@ -2914,78 +2914,89 @@ export default function App() {
         {activeTab === 'reports' && (
           <div>
             {/* Filter Timeframe & Print Row */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '14px' }} className="no-print">
-              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
-                <button 
-                  className={`btn ${reportPeriod === 'today' ? 'btn-primary' : 'btn-secondary'}`}
-                  style={{ padding: '7px 14px', fontSize: '0.82rem' }}
-                  onClick={() => setReportPeriod('today')}
-                >
-                  ⚡ Hari Ini
-                </button>
-                <button 
-                  className={`btn ${reportPeriod === 'week' ? 'btn-primary' : 'btn-secondary'}`}
-                  style={{ padding: '7px 14px', fontSize: '0.82rem' }}
-                  onClick={() => setReportPeriod('week')}
-                >
-                  📅 7 Hari Terakhir
-                </button>
-                <button 
-                  className={`btn ${reportPeriod === 'month' ? 'btn-primary' : 'btn-secondary'}`}
-                  style={{ padding: '7px 14px', fontSize: '0.82rem' }}
-                  onClick={() => setReportPeriod('month')}
-                >
-                  🗓️ Bulan Ini
-                </button>
-                <button 
-                  className={`btn ${reportPeriod === 'year' ? 'btn-primary' : 'btn-secondary'}`}
-                  style={{ padding: '7px 14px', fontSize: '0.82rem' }}
-                  onClick={() => setReportPeriod('year')}
-                >
-                  📊 Tahun Ini
-                </button>
-                <button 
-                  className={`btn ${reportPeriod === 'all' ? 'btn-primary' : 'btn-secondary'}`}
-                  style={{ padding: '7px 14px', fontSize: '0.82rem' }}
-                  onClick={() => setReportPeriod('all')}
-                >
-                  🌐 Semua Waktu
-                </button>
-                <button 
-                  className={`btn ${reportPeriod === 'custom' ? 'btn-primary' : 'btn-secondary'}`}
-                  style={{ padding: '7px 14px', fontSize: '0.82rem' }}
-                  onClick={() => setReportPeriod('custom')}
-                >
-                  📆 Pilih Tanggal
-                </button>
+            <div className="overview-filter-bar no-print">
+              <div className="overview-filter-left">
+                <span className="overview-filter-title">
+                  <span>📅</span>
+                  <span>Filter Periode:</span>
+                </span>
 
-                {/* Dropdown specific month */}
-                <select 
-                  className="overview-month-select"
-                  style={{ minWidth: '170px', padding: '6px 12px', fontSize: '0.82rem', height: '36px' }}
-                  value={reportPeriod.match(/^\d{4}-\d{2}$/) ? reportPeriod : ''}
-                  onChange={(e) => {
-                    if (e.target.value) setReportPeriod(e.target.value);
-                  }}
-                >
-                  <option value="" disabled>-- Pilih Bulan (Jan - Sep) --</option>
-                  {availableMonths.map(m => (
-                    <option key={m} value={m}>
-                      {formatMonthLabel(m)}
-                    </option>
-                  ))}
-                </select>
+                <div className="overview-filter-pills">
+                  <button 
+                    type="button"
+                    className={`overview-pill ${reportPeriod === 'today' ? 'active' : ''}`}
+                    onClick={() => setReportPeriod('today')}
+                  >
+                    ⚡ Hari Ini
+                  </button>
+                  <button 
+                    type="button"
+                    className={`overview-pill ${reportPeriod === 'week' ? 'active' : ''}`}
+                    onClick={() => setReportPeriod('week')}
+                  >
+                    📅 7 Hari Terakhir
+                  </button>
+                  <button 
+                    type="button"
+                    className={`overview-pill ${reportPeriod === 'month' ? 'active' : ''}`}
+                    onClick={() => setReportPeriod('month')}
+                  >
+                    🗓️ Bulan Ini
+                  </button>
+                  <button 
+                    type="button"
+                    className={`overview-pill ${reportPeriod === 'year' ? 'active' : ''}`}
+                    onClick={() => setReportPeriod('year')}
+                  >
+                    📊 Tahun Ini
+                  </button>
+                  <button 
+                    type="button"
+                    className={`overview-pill ${reportPeriod === 'all' ? 'active' : ''}`}
+                    onClick={() => setReportPeriod('all')}
+                  >
+                    🌐 Semua Waktu
+                  </button>
+                  <button 
+                    type="button"
+                    className={`overview-pill ${reportPeriod === 'custom' ? 'active' : ''}`}
+                    onClick={() => setReportPeriod('custom')}
+                  >
+                    📆 Kustom Tanggal
+                  </button>
+                </div>
               </div>
 
-              {/* Print Button */}
-              <button 
-                className="btn btn-primary"
-                onClick={() => window.print()}
-                style={{ padding: '9px 18px', gap: '8px', fontSize: '0.85rem' }}
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-                🖨️ Cetak / Simpan PDF
-              </button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                {/* Dropdown specific month */}
+                <div className="overview-dropdown-wrapper">
+                  <label className="overview-dropdown-label">Pilih Bulan:</label>
+                  <select 
+                    className="overview-month-select"
+                    value={reportPeriod.match(/^\d{4}-\d{2}$/) ? reportPeriod : ''}
+                    onChange={(e) => {
+                      if (e.target.value) setReportPeriod(e.target.value);
+                    }}
+                  >
+                    <option value="" disabled>-- Pilih Bulan (Jan - Sep) --</option>
+                    {availableMonths.map(m => (
+                      <option key={m} value={m}>
+                        {formatMonthLabel(m)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Print Button */}
+                <button 
+                  className="btn btn-primary"
+                  onClick={() => window.print()}
+                  style={{ padding: '8px 16px', gap: '8px', fontSize: '0.85rem' }}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                  🖨️ Cetak / Simpan PDF
+                </button>
+              </div>
             </div>
 
             {/* Custom Date Pickers */}

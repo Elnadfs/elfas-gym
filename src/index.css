@@ -1106,47 +1106,82 @@ tr:hover td {
   }
 }
 
-/* Overview Date / Month Filter Bar */
+/* Overview & Reports Date / Month Filter Bar */
 .overview-filter-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 12px;
-  background: var(--bg-card);
+  gap: 14px;
+  background: rgba(15, 23, 42, 0.65);
   border: 1px solid var(--border-color);
   padding: 12px 18px;
   border-radius: var(--radius-lg);
   margin-bottom: 20px;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .overview-filter-left {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   flex-wrap: wrap;
 }
 
-.overview-filter-right {
+.overview-filter-title {
   display: flex;
   align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.overview-filter-icon {
-  font-size: 1.2rem;
-}
-
-.overview-filter-label {
+  gap: 6px;
   font-size: 0.88rem;
   font-weight: 600;
   color: var(--text-secondary);
 }
 
-.overview-select-wrapper {
+.overview-filter-pills {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 4px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  flex-wrap: wrap;
+}
+
+.overview-pill {
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  color: var(--text-secondary) !important;
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 6px 13px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition);
+  outline: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.overview-pill:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: var(--text-primary) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.overview-pill.active {
+  background: rgba(0, 242, 254, 0.15) !important;
+  color: var(--accent) !important;
+  font-weight: 700;
+  border-color: rgba(0, 242, 254, 0.45) !important;
+  box-shadow: 0 0 12px rgba(0, 242, 254, 0.2);
+}
+
+.overview-dropdown-wrapper {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -1160,15 +1195,16 @@ tr:hover td {
 
 .overview-month-select {
   padding: 7px 12px;
-  font-size: 0.88rem;
-  font-weight: 600;
-  background: var(--bg-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  background: rgba(15, 23, 42, 0.85);
   color: var(--text-primary);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   cursor: pointer;
   min-width: 170px;
   transition: var(--transition);
+  outline: none;
 }
 
 .overview-month-select:hover, .overview-month-select:focus {
