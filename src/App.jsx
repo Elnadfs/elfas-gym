@@ -26,6 +26,12 @@ const defaultTransactions = [];
 export default function App() {
   // Tabs: overview, members, daily_visitors, gym_store, packages, transactions, reports
   const [activeTab, setActiveTab] = useState('overview');
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    setIsMobileNavOpen(false);
+  };
   
   // Data States
   const [members, setMembers] = useState(() => {
@@ -66,6 +72,7 @@ export default function App() {
     const local = localStorage.getItem('gymfit_daily_price');
     return local ? parseInt(local) : 35000;
   });
+  const [dailyPriceSaved, setDailyPriceSaved] = useState(false);
   
   const [transactions, setTransactions] = useState(() => {
     const local = localStorage.getItem('gymfit_transactions');
@@ -127,10 +134,23 @@ export default function App() {
     localStorage.setItem('gymfit_attendance_logs', JSON.stringify(attendanceLogs));
   }, [attendanceLogs]);
 
-  // Authentication State
+  // Authentication State with 1-Hour Session Expiry (3600000 ms)
+  const SESSION_DURATION_MS = 60 * 60 * 1000; // 1 Jam
+
   const [currentUser, setCurrentUser] = useState(() => {
-    const local = localStorage.getItem('gymfit_auth_user');
-    return local ? JSON.parse(local) : null;
+    try {
+      const local = localStorage.getItem('gymfit_auth_user');
+      if (!local) return null;
+      const parsed = JSON.parse(local);
+      if (!parsed || !parsed.sessionExpiresAt || Date.now() > parsed.sessionExpiresAt) {
+        localStorage.removeItem('gymfit_auth_user');
+        return null;
+      }
+      return parsed;
+    } catch {
+      localStorage.removeItem('gymfit_auth_user');
+      return null;
+    }
   });
 
   const [loginForm, setLoginForm] = useState({
@@ -141,6 +161,16 @@ export default function App() {
   const [loginError, setLoginError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
+  // Helper untuk simpan sesi berdurasi 1 jam
+  const saveUserSession = (user) => {
+    const sessionData = {
+      ...user,
+      sessionExpiresAt: Date.now() + SESSION_DURATION_MS
+    };
+    setCurrentUser(sessionData);
+    localStorage.setItem('gymfit_auth_user', JSON.stringify(sessionData));
+  };
+
   const handleLogin = (e) => {
     if (e) e.preventDefault();
     setLoginError('');
@@ -149,16 +179,10 @@ export default function App() {
 
     if (u === 'elnad' && p === '251203') {
       const user = { username: 'elnad', name: 'Elnad (Owner)', role: 'owner' };
-      setCurrentUser(user);
-      if (loginForm.remember) {
-        localStorage.setItem('gymfit_auth_user', JSON.stringify(user));
-      }
+      saveUserSession(user);
     } else if (u === 'elfas' && p === 'fitnessbugar') {
       const user = { username: 'elfas', name: 'Kasir Elfas Fitness', role: 'staff' };
-      setCurrentUser(user);
-      if (loginForm.remember) {
-        localStorage.setItem('gymfit_auth_user', JSON.stringify(user));
-      }
+      saveUserSession(user);
     } else {
       setLoginError('Username atau Password salah! Periksa kembali.');
     }
@@ -175,14 +199,38 @@ export default function App() {
   const handleQuickPresetLogin = (role) => {
     if (role === 'owner') {
       const user = { username: 'elnad', name: 'Elnad (Owner)', role: 'owner' };
-      setCurrentUser(user);
-      localStorage.setItem('gymfit_auth_user', JSON.stringify(user));
+      saveUserSession(user);
     } else {
       const user = { username: 'elfas', name: 'Kasir Elfas Fitness', role: 'staff' };
-      setCurrentUser(user);
-      localStorage.setItem('gymfit_auth_user', JSON.stringify(user));
+      saveUserSession(user);
     }
   };
+
+  // Background watcher: otomatis logout jika sesi telah lewat dari 1 jam
+  useEffect(() => {
+    if (!currentUser) return;
+
+    const checkInterval = setInterval(() => {
+      try {
+        const local = localStorage.getItem('gymfit_auth_user');
+        if (!local) {
+          setCurrentUser(null);
+          return;
+        }
+        const parsed = JSON.parse(local);
+        if (!parsed || !parsed.sessionExpiresAt || Date.now() > parsed.sessionExpiresAt) {
+          setCurrentUser(null);
+          localStorage.removeItem('gymfit_auth_user');
+          setLoginError('⏱️ Sesi login Anda telah berakhir (1 jam). Silakan login kembali demi keamanan.');
+        }
+      } catch {
+        setCurrentUser(null);
+        localStorage.removeItem('gymfit_auth_user');
+      }
+    }, 5000);
+
+    return () => clearInterval(checkInterval);
+  }, [currentUser]);
 
   // Cloud Realtime State
   const [cloudSyncStatus, setCloudSyncStatus] = useState('syncing'); // syncing, connected, offline
@@ -197,6 +245,12 @@ export default function App() {
         if (data.attendanceLogs) setAttendanceLogs(data.attendanceLogs);
         if (data.expenses) setExpenses(data.expenses);
         if (data.dailyVisitors) setDailyVisitors(data.dailyVisitors);
+        if (data.packages && data.packages.length > 0) setPackages(data.packages);
+        if (data.products && data.products.length > 0) setProducts(data.products);
+        if (data.settings && data.settings.daily_price) {
+          const p = parseInt(data.settings.daily_price);
+          if (!isNaN(p) && p > 0) setDailyPrice(p);
+        }
         setCloudSyncStatus('connected');
       }
     } catch (err) {
@@ -289,6 +343,9 @@ export default function App() {
     duration: 1,
     price: 0
   });
+
+  const [txFilterFrom, setTxFilterFrom] = useState('');
+  const [txFilterTo, setTxFilterTo] = useState('');
 
   const [dailyForm, setDailyForm] = useState({
     id: '',
@@ -577,7 +634,7 @@ export default function App() {
 
     // Update Member dates and package
     setMembers(prev => prev.map(m => m.id === renewForm.memberId ? { ...m, ...updatedRenewData } : m));
-    db.saveMember({ id: renewForm.memberId, ...updatedRenewData });
+    db.saveMember({ ...oldMember, id: renewForm.memberId, ...updatedRenewData });
 
     // Record renewal transaction in cashier (with rollback snapshot)
     const txId = `TX-${Date.now().toString().slice(-6)}`;
@@ -725,20 +782,24 @@ export default function App() {
   const handleSavePackage = (e) => {
     e.preventDefault();
     if (packageForm.id) {
-      setPackages(prev => prev.map(p => p.id === packageForm.id ? {
-        ...p,
+      const updatedPkg = {
+        id: packageForm.id,
         name: packageForm.name,
         duration: parseInt(packageForm.duration),
         price: parseInt(packageForm.price)
-      } : p));
+      };
+      setPackages(prev => prev.map(p => p.id === packageForm.id ? { ...p, ...updatedPkg } : p));
+      db.savePackage(updatedPkg);
     } else {
       const newId = `pkg-${Date.now()}`;
-      setPackages(prev => [...prev, {
+      const newPkg = {
         id: newId,
         name: packageForm.name,
         duration: parseInt(packageForm.duration),
         price: parseInt(packageForm.price)
-      }]);
+      };
+      setPackages(prev => [...prev, newPkg]);
+      db.savePackage(newPkg);
     }
     setIsPackageModalOpen(false);
   };
@@ -746,6 +807,7 @@ export default function App() {
   const handleDeletePackage = (id) => {
     if (window.confirm('Apakah Anda yakin ingin menghapus paket ini?')) {
       setPackages(prev => prev.filter(p => p.id !== id));
+      db.deletePackage(id);
     }
   };
 
@@ -837,11 +899,30 @@ export default function App() {
     if (window.confirm('Hapus data kunjungan harian ini?')) {
       const visitor = dailyVisitors.find(d => d.id === id);
       setDailyVisitors(prev => prev.filter(d => d.id !== id));
+      db.deleteDailyVisitor(id);
       
       // Also remove its transaction from revenue
       if (visitor) {
         setTransactions(prev => prev.filter(t => !(t.type === 'Kunjungan Harian' && t.memberName === visitor.name && t.date === visitor.date)));
       }
+    }
+  };
+
+  const handleSaveDailyPrice = async () => {
+    try {
+      const priceVal = parseInt(dailyPrice) || 0;
+      await db.saveSetting('daily_price', priceVal.toString());
+      setDailyPriceSaved(true);
+      setTimeout(() => setDailyPriceSaved(false), 3000);
+      setCheckInAlert({
+        type: 'success',
+        title: '✅ Tarif Harian Disimpan!',
+        message: `Tarif kunjungan harian berhasil diatur ke ${formatRupiah(priceVal)}.`,
+        details: 'Harga telah tersinkron otomatis ke semua perangkat kasir.'
+      });
+      setTimeout(() => setCheckInAlert(null), 4000);
+    } catch (err) {
+      alert('Gagal menyimpan tarif harian ke cloud: ' + err.message);
     }
   };
 
@@ -859,20 +940,24 @@ export default function App() {
   const handleSaveProduct = (e) => {
     e.preventDefault();
     if (productForm.id) {
-      setProducts(prev => prev.map(p => p.id === productForm.id ? {
-        ...p,
+      const updated = {
+        id: productForm.id,
         name: productForm.name,
         price: parseInt(productForm.price),
         stock: parseInt(productForm.stock)
-      } : p));
+      };
+      setProducts(prev => prev.map(p => p.id === productForm.id ? { ...p, ...updated } : p));
+      db.saveProduct(updated);
     } else {
       const newId = `prod-${Date.now()}`;
-      setProducts(prev => [...prev, {
+      const newProd = {
         id: newId,
         name: productForm.name,
         price: parseInt(productForm.price),
         stock: parseInt(productForm.stock)
-      }]);
+      };
+      setProducts(prev => [...prev, newProd]);
+      db.saveProduct(newProd);
     }
     setIsProductModalOpen(false);
   };
@@ -880,6 +965,7 @@ export default function App() {
   const handleDeleteProduct = (id) => {
     if (window.confirm('Hapus produk ini dari katalog?')) {
       setProducts(prev => prev.filter(p => p.id !== id));
+      db.deleteProduct(id);
     }
   };
 
@@ -949,17 +1035,20 @@ export default function App() {
         `Hapus transaksi perpanjangan ini dan kembalikan masa aktif member "${tx.memberName}" ke tanggal sebelumnya (${tx.previousEndDate})?`
       );
       if (confirmRollback) {
+        const targetMember = members.find(m => m.id === tx.memberId);
         const rollbackData = {
-          packageId: tx.previousPackageId,
-          startDate: tx.previousStartDate,
+          packageId: tx.previousPackageId || targetMember?.packageId || 'pkg-1',
+          startDate: tx.previousStartDate || targetMember?.startDate || '',
           endDate: tx.previousEndDate
         };
-        setMembers(prev => prev.map(m => m.id === tx.memberId ? {
-          ...m,
+        const rolledBackMember = {
+          ...targetMember,
           ...rollbackData,
-          historyCount: Math.max(0, (m.historyCount || 1) - 1)
-        } : m));
-        db.saveMember({ id: tx.memberId, ...rollbackData });
+          id: tx.memberId,
+          historyCount: Math.max(0, (targetMember?.historyCount || 1) - 1)
+        };
+        setMembers(prev => prev.map(m => m.id === tx.memberId ? rolledBackMember : m));
+        db.saveMember(rolledBackMember);
         setTransactions(prev => prev.filter(t => t.id !== id));
         db.deleteTransaction(id);
         setCheckInAlert({
@@ -973,6 +1062,7 @@ export default function App() {
     } else {
       if (window.confirm('Hapus riwayat transaksi ini?')) {
         setTransactions(prev => prev.filter(t => t.id !== id));
+        db.deleteTransaction(id);
       }
     }
   };
@@ -1057,28 +1147,43 @@ export default function App() {
     alert('Checkout berhasil!');
   };
 
+  // Helper tanggal lokal YYYY-MM-DD aman dari pergeseran UTC
+  const formatLocalDateStr = (d) => {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const { chartPoints, monthsLabel, maxVal } = (() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
     let labels = [];
     let values = [];
+    let details = [];
 
     if (chartPeriod === 'daily') {
-      // Last 7 days
+      // 7 Hari Terakhir
       for (let i = 6; i >= 0; i--) {
         const d = new Date(today);
         d.setDate(today.getDate() - i);
         labels.push(d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }));
         
-        const dateStr = d.toISOString().split('T')[0];
-        const sum = transactions
-          .filter(t => t.date === dateStr)
-          .reduce((acc, curr) => acc + curr.amount, 0);
+        const dateStr = formatLocalDateStr(d);
+        const matched = transactions.filter(t => t.date === dateStr);
+        const sum = matched.reduce((acc, curr) => acc + (curr.amount || 0), 0);
         values.push(sum);
+        details.push({
+          dateStr,
+          count: matched.length,
+          membership: matched.filter(t => t.type === 'Membership').reduce((acc, curr) => acc + (curr.amount || 0), 0),
+          daily: matched.filter(t => t.type === 'Kunjungan Harian').reduce((acc, curr) => acc + (curr.amount || 0), 0),
+          store: matched.filter(t => t.type === 'Toko').reduce((acc, curr) => acc + (curr.amount || 0), 0)
+        });
       }
     } else if (chartPeriod === 'weekly') {
-      // Last 4 weeks
+      // 4 Minggu Terakhir
       for (let i = 3; i >= 0; i--) {
         labels.push(`Minggu ${4 - i}`);
         const start = new Date(today);
@@ -1086,14 +1191,22 @@ export default function App() {
         const end = new Date(today);
         end.setDate(today.getDate() - i * 7);
         
-        const sum = transactions.filter(t => {
-          const tDate = new Date(t.date);
-          return tDate >= start && tDate <= end;
-        }).reduce((acc, curr) => acc + curr.amount, 0);
+        const startStr = formatLocalDateStr(start);
+        const endStr = formatLocalDateStr(end);
+        
+        const matched = transactions.filter(t => t.date >= startStr && t.date <= endStr);
+        const sum = matched.reduce((acc, curr) => acc + (curr.amount || 0), 0);
         values.push(sum);
+        details.push({
+          dateStr: `${startStr} s/d ${endStr}`,
+          count: matched.length,
+          membership: matched.filter(t => t.type === 'Membership').reduce((acc, curr) => acc + (curr.amount || 0), 0),
+          daily: matched.filter(t => t.type === 'Kunjungan Harian').reduce((acc, curr) => acc + (curr.amount || 0), 0),
+          store: matched.filter(t => t.type === 'Toko').reduce((acc, curr) => acc + (curr.amount || 0), 0)
+        });
       }
     } else if (chartPeriod === 'monthly') {
-      // Bulanan (Current Month): Day 1 to Last Day of Month
+      // Bulan Ini (Hari ke-1 s/d hari terakhir bulan ini)
       const currentYear = today.getFullYear();
       const currentMonth = today.getMonth();
       const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
@@ -1101,30 +1214,48 @@ export default function App() {
       for (let i = 1; i <= daysInMonth; i++) {
         labels.push(`${i}`);
         const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-        const sum = transactions
-          .filter(t => t.date === dateStr)
-          .reduce((acc, curr) => acc + curr.amount, 0);
+        const matched = transactions.filter(t => t.date === dateStr);
+        const sum = matched.reduce((acc, curr) => acc + (curr.amount || 0), 0);
         values.push(sum);
+        details.push({
+          dateStr,
+          count: matched.length,
+          membership: matched.filter(t => t.type === 'Membership').reduce((acc, curr) => acc + (curr.amount || 0), 0),
+          daily: matched.filter(t => t.type === 'Kunjungan Harian').reduce((acc, curr) => acc + (curr.amount || 0), 0),
+          store: matched.filter(t => t.type === 'Toko').reduce((acc, curr) => acc + (curr.amount || 0), 0)
+        });
       }
     } else {
-      // Tahunan (Yearly): Months of this year (Jan - Dec)
+      // Tahunan (Jan - Des tahun berjalan)
       labels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
       const currentYear = today.getFullYear();
       values = Array(12).fill(0);
+      const matchedByMonth = Array(12).fill(null).map(() => []);
+
       transactions.forEach(t => {
-        const tDate = new Date(t.date);
-        if (tDate.getFullYear() === currentYear) {
-          values[tDate.getMonth()] += t.amount;
+        if (!t.date) return;
+        const [y, m] = t.date.split('-').map(Number);
+        if (y === currentYear && m >= 1 && m <= 12) {
+          values[m - 1] += (t.amount || 0);
+          matchedByMonth[m - 1].push(t);
         }
       });
+
+      details = matchedByMonth.map((matched, idx) => ({
+        dateStr: `${labels[idx]} ${currentYear}`,
+        count: matched.length,
+        membership: matched.filter(t => t.type === 'Membership').reduce((acc, curr) => acc + (curr.amount || 0), 0),
+        daily: matched.filter(t => t.type === 'Kunjungan Harian').reduce((acc, curr) => acc + (curr.amount || 0), 0),
+        store: matched.filter(t => t.type === 'Toko').reduce((acc, curr) => acc + (curr.amount || 0), 0)
+      }));
     }
 
-    const maxV = Math.max(...values, 1000000);
+    const maxV = Math.max(...values, 500000);
     const len = values.length;
     const chartPts = values.map((val, idx) => {
-      const x = 35 + idx * (450 / (len - 1 || 1));
-      const y = 140 - (val / maxV) * 100;
-      return { x, y, val };
+      const x = 35 + idx * (440 / (len - 1 || 1));
+      const y = 140 - (val / maxV) * 105;
+      return { x, y, val, detail: details[idx], label: labels[idx], index: idx };
     });
 
     return { chartPoints: chartPts, monthsLabel: labels, maxVal: maxV };
@@ -1137,46 +1268,6 @@ export default function App() {
   const areaD = chartPoints.length > 0 
     ? `${lineD} L ${chartPoints[chartPoints.length - 1].x} 150 L ${chartPoints[0].x} 150 Z` 
     : '';
-
-  const getPointBreakdown = (point) => {
-    if (!point) return null;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    let filtered = [];
-    if (chartPeriod === 'daily') {
-      const d = new Date(today);
-      d.setDate(today.getDate() - (6 - point.index));
-      const dateStr = d.toISOString().split('T')[0];
-      filtered = transactions.filter(t => t.date === dateStr);
-    } else if (chartPeriod === 'weekly') {
-      const start = new Date(today);
-      start.setDate(today.getDate() - (4 - point.index) * 7 + 1);
-      const end = new Date(today);
-      end.setDate(today.getDate() - (3 - point.index) * 7);
-      filtered = transactions.filter(t => {
-        const tDate = new Date(t.date);
-        return tDate >= start && tDate <= end;
-      });
-    } else if (chartPeriod === 'monthly') {
-      const currentYear = today.getFullYear();
-      const currentMonth = today.getMonth();
-      const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(point.index + 1).padStart(2, '0')}`;
-      filtered = transactions.filter(t => t.date === dateStr);
-    } else {
-      const currentYear = today.getFullYear();
-      filtered = transactions.filter(t => {
-        const tDate = new Date(t.date);
-        return tDate.getFullYear() === currentYear && tDate.getMonth() === point.index;
-      });
-    }
-
-    const membership = filtered.filter(t => t.type === 'Membership').reduce((acc, curr) => acc + curr.amount, 0);
-    const daily = filtered.filter(t => t.type === 'Kunjungan Harian').reduce((acc, curr) => acc + curr.amount, 0);
-    const store = filtered.filter(t => t.type === 'Toko').reduce((acc, curr) => acc + curr.amount, 0);
-
-    return { membership, daily, store };
-  };
 
   // IF NOT LOGGED IN, SHOW LOGIN PORTAL
   if (!currentUser) {
@@ -1242,15 +1333,9 @@ export default function App() {
               />
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                <input 
-                  type="checkbox" 
-                  checked={loginForm.remember}
-                  onChange={(e) => setLoginForm(prev => ({ ...prev, remember: e.target.checked }))}
-                />
-                Ingat Sesi Login
-              </label>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginBottom: '22px', fontSize: '0.82rem', color: 'var(--text-secondary)', background: 'var(--bg-secondary)', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+              <span>⏱️</span>
+              <span>Sesi aman otomatis logout setiap <strong>1 jam</strong></span>
             </div>
 
             <button type="submit" className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '12px', fontSize: '0.95rem' }}>
@@ -1264,68 +1349,124 @@ export default function App() {
 
   return (
     <div className="app-container">
-      {/* Sidebar */}
-      <aside>
-        <div className="brand" style={{ gap: '12px' }}>
+      {/* Mobile Sticky Header Bar */}
+      <div className="mobile-header-bar">
+        <button 
+          className="mobile-nav-toggle-btn" 
+          onClick={() => setIsMobileNavOpen(!isMobileNavOpen)} 
+          aria-label="Buka Menu Navigasi"
+          title="Buka Menu"
+        >
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+        <div className="mobile-brand">
           <img 
             src={gymLogo} 
             alt="ELFAS Logo" 
             style={{ 
-              width: '38px', 
-              height: '38px', 
+              width: '32px', 
+              height: '32px', 
               borderRadius: '50%', 
               objectFit: 'cover', 
-              border: '1.5px solid var(--accent)', 
-              boxShadow: '0 0 10px rgba(0, 242, 254, 0.35)' 
+              border: '1.5px solid var(--accent)' 
             }} 
           />
           <span>ELFAS GYM</span>
         </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div 
+            style={{ 
+              width: '8px', 
+              height: '8px', 
+              borderRadius: '50%', 
+              backgroundColor: cloudSyncStatus === 'connected' ? 'var(--success)' : 'var(--warning)',
+              boxShadow: cloudSyncStatus === 'connected' ? '0 0 8px var(--success)' : 'none'
+            }} 
+            title={cloudSyncStatus === 'connected' ? 'Database Cloud: Live Realtime' : 'Database Cloud: Syncing/Lokal'} 
+          />
+          <div className="user-avatar" style={{ width: '34px', height: '34px', fontSize: '0.9rem' }}>
+            {currentUser.name ? currentUser.name.charAt(0) : 'U'}
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Backdrop Overlay */}
+      <div 
+        className={`mobile-nav-backdrop ${isMobileNavOpen ? 'active' : ''}`}
+        onClick={() => setIsMobileNavOpen(false)}
+      />
+
+      {/* Sidebar / Mobile Navigation Drawer */}
+      <aside className={isMobileNavOpen ? 'nav-open' : ''}>
+        <div className="brand">
+          <div className="brand-main">
+            <img 
+              src={gymLogo} 
+              alt="ELFAS Logo" 
+              style={{ 
+                width: '38px', 
+                height: '38px', 
+                borderRadius: '50%', 
+                objectFit: 'cover', 
+                border: '1.5px solid var(--accent)', 
+                boxShadow: '0 0 10px rgba(0, 242, 254, 0.35)' 
+              }} 
+            />
+            <span>ELFAS GYM</span>
+          </div>
+          <button className="drawer-close-btn" onClick={() => setIsMobileNavOpen(false)} title="Tutup Menu">
+            ✕
+          </button>
+        </div>
         <ul className="nav-links">
           <li className={`nav-item ${activeTab === 'overview' ? 'active' : ''}`}>
-            <button onClick={() => setActiveTab('overview')}>
+            <button onClick={() => handleTabChange('overview')}>
               <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
               Overview
             </button>
           </li>
           <li className={`nav-item ${activeTab === 'members' ? 'active' : ''}`}>
-            <button onClick={() => setActiveTab('members')}>
+            <button onClick={() => handleTabChange('members')}>
               <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
               Anggota (Members)
             </button>
           </li>
           <li className={`nav-item ${activeTab === 'daily_visitors' ? 'active' : ''}`}>
-            <button onClick={() => setActiveTab('daily_visitors')}>
+            <button onClick={() => handleTabChange('daily_visitors')}>
               <svg viewBox="0 0 24 24"><path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/></svg>
               Kunjungan Harian
             </button>
           </li>
           <li className={`nav-item ${activeTab === 'gym_store' ? 'active' : ''}`}>
-            <button onClick={() => setActiveTab('gym_store')}>
+            <button onClick={() => handleTabChange('gym_store')}>
               <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
               Toko
             </button>
           </li>
           <li className={`nav-item ${activeTab === 'packages' ? 'active' : ''}`}>
-            <button onClick={() => setActiveTab('packages')}>
+            <button onClick={() => handleTabChange('packages')}>
               <svg viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></svg>
               Paket Layanan
             </button>
           </li>
           <li className={`nav-item ${activeTab === 'transactions' ? 'active' : ''}`}>
-            <button onClick={() => setActiveTab('transactions')}>
+            <button onClick={() => handleTabChange('transactions')}>
               <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
               Transaksi
             </button>
           </li>
           <li className={`nav-item ${activeTab === 'expenses' ? 'active' : ''}`}>
-            <button onClick={() => setActiveTab('expenses')}>
+            <button onClick={() => handleTabChange('expenses')}>
               <svg viewBox="0 0 24 24"><path d="M19 14V6c0-1.1-.9-2-2-2H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zm-9-2c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm13-6v10c0 1.1-.9 2-2 2H4v-2h17V6h2z"/></svg>
               Pengeluaran
             </button>
           </li>
           <li className={`nav-item ${activeTab === 'reports' ? 'active' : ''}`}>
-            <button onClick={() => setActiveTab('reports')}>
+            <button onClick={() => handleTabChange('reports')}>
               <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
               Laporan & Rekap
             </button>
@@ -1516,83 +1657,125 @@ export default function App() {
               )}
             </div>
 
-            {/* Grafik Omzet Bulanan */}
+            {/* Grafik Omzet & Tren Pendapatan Interaktif */}
             <div className="card-table-wrapper" style={{ marginBottom: '32px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                <h3 style={{ fontSize: '1.1rem', fontWeight: '600' }}>
-                  {chartPeriod === 'daily' && 'Tren Pendapatan Harian (7 Hari Terakhir)'}
-                  {chartPeriod === 'weekly' && 'Tren Pendapatan Mingguan (4 Minggu Terakhir)'}
-                  {chartPeriod === 'monthly' && `Tren Pendapatan Bulanan (Bulan Ini)`}
-                  {chartPeriod === 'yearly' && `Tren Pendapatan Tahunan (${new Date().getFullYear()})`}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span>📈</span>
+                  <span>
+                    {chartPeriod === 'daily' && 'Tren Pendapatan Harian (7 Hari Terakhir)'}
+                    {chartPeriod === 'weekly' && 'Tren Pendapatan Mingguan (4 Minggu Terakhir)'}
+                    {chartPeriod === 'monthly' && `Tren Pendapatan Bulanan (Bulan Ini)`}
+                    {chartPeriod === 'yearly' && `Tren Pendapatan Tahunan (${new Date().getFullYear()})`}
+                  </span>
                 </h3>
-                {/* Chart Period Selectors */}
-                <div style={{ display: 'flex', gap: '6px', backgroundColor: 'var(--bg-tertiary)', padding: '4px', borderRadius: '8px' }}>
+
+                {/* Modern Interactive Filter Pills */}
+                <div className="chart-filter-pills">
                   <button 
-                    onClick={() => setChartPeriod('daily')} 
-                    style={{ background: chartPeriod === 'daily' ? 'var(--bg-secondary)' : 'none', border: 'none', color: 'var(--text-primary)', fontSize: '0.75rem', padding: '4px 8px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}
+                    className={`chart-filter-pill ${chartPeriod === 'daily' ? 'active' : ''}`}
+                    onClick={() => { setChartPeriod('daily'); setHoveredPoint(null); }} 
                   >
                     Harian
                   </button>
                   <button 
-                    onClick={() => setChartPeriod('weekly')} 
-                    style={{ background: chartPeriod === 'weekly' ? 'var(--bg-secondary)' : 'none', border: 'none', color: 'var(--text-primary)', fontSize: '0.75rem', padding: '4px 8px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}
+                    className={`chart-filter-pill ${chartPeriod === 'weekly' ? 'active' : ''}`}
+                    onClick={() => { setChartPeriod('weekly'); setHoveredPoint(null); }} 
                   >
                     Mingguan
                   </button>
                   <button 
-                    onClick={() => setChartPeriod('monthly')} 
-                    style={{ background: chartPeriod === 'monthly' ? 'var(--bg-secondary)' : 'none', border: 'none', color: 'var(--text-primary)', fontSize: '0.75rem', padding: '4px 8px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}
+                    className={`chart-filter-pill ${chartPeriod === 'monthly' ? 'active' : ''}`}
+                    onClick={() => { setChartPeriod('monthly'); setHoveredPoint(null); }} 
                   >
                     Bulanan
                   </button>
                   <button 
-                    onClick={() => setChartPeriod('yearly')} 
-                    style={{ background: chartPeriod === 'yearly' ? 'var(--bg-secondary)' : 'none', border: 'none', color: 'var(--text-primary)', fontSize: '0.75rem', padding: '4px 8px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}
+                    className={`chart-filter-pill ${chartPeriod === 'yearly' ? 'active' : ''}`}
+                    onClick={() => { setChartPeriod('yearly'); setHoveredPoint(null); }} 
                   >
                     Tahunan
                   </button>
                 </div>
               </div>
-              <div style={{ position: 'relative', width: '100%', height: '220px' }}>
+
+              {/* Chart Container with Floating Tooltip */}
+              <div style={{ position: 'relative', width: '100%', height: '220px', userSelect: 'none' }}>
                 <svg viewBox="0 0 500 180" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
                   <defs>
                     <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="var(--accent)" stopOpacity="0.4" />
+                      <stop offset="0%" stopColor="var(--accent)" stopOpacity="0.45" />
                       <stop offset="100%" stopColor="var(--accent)" stopOpacity="0.0" />
                     </linearGradient>
+                    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                      <feGaussianBlur stdDeviation="3" result="glow" />
+                      <feComposite in="SourceGraphic" in2="glow" operator="over" />
+                    </filter>
                   </defs>
                   
                   {/* Grid Lines */}
-                  <line x1="30" y1="40" x2="480" y2="40" stroke="var(--border-color)" strokeDasharray="3" />
-                  <line x1="30" y1="90" x2="480" y2="90" stroke="var(--border-color)" strokeDasharray="3" />
+                  <line x1="30" y1="35" x2="480" y2="35" stroke="var(--border-color)" strokeDasharray="3" />
+                  <line x1="30" y1="88" x2="480" y2="88" stroke="var(--border-color)" strokeDasharray="3" />
                   <line x1="30" y1="140" x2="480" y2="140" stroke="var(--border-color)" strokeDasharray="3" />
                   
                   {/* Y Axis Labels */}
-                  <text x="5" y="45" fill="var(--text-muted)" fontSize="8">{formatRupiah(maxVal)}</text>
-                  <text x="5" y="95" fill="var(--text-muted)" fontSize="8">{formatRupiah(maxVal / 2)}</text>
-                  <text x="5" y="145" fill="var(--text-muted)" fontSize="8">Rp 0</text>
+                  <text x="5" y="39" fill="var(--text-muted)" fontSize="8" fontWeight="600">{formatRupiah(maxVal)}</text>
+                  <text x="5" y="92" fill="var(--text-muted)" fontSize="8" fontWeight="600">{formatRupiah(Math.round(maxVal / 2))}</text>
+                  <text x="5" y="144" fill="var(--text-muted)" fontSize="8" fontWeight="600">Rp 0</text>
 
                   {/* Area Under Curve */}
-                  {areaD && <path d={areaD} fill="url(#chartGrad)" />}
+                  {areaD && <path d={areaD} fill="url(#chartGrad)" style={{ transition: 'all 0.4s ease' }} />}
 
-                  {/* Line Path */}
-                  {lineD && <path d={lineD} fill="none" stroke="var(--accent)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />}
+                  {/* Line Path with subtle glow */}
+                  {lineD && (
+                    <path 
+                      d={lineD} 
+                      fill="none" 
+                      stroke="var(--accent)" 
+                      strokeWidth="3.5" 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      filter="url(#glow)"
+                      className="chart-line-animated"
+                    />
+                  )}
 
-                  {/* Data Points (Dots) */}
+                  {/* Hover vertical line */}
+                  {hoveredPoint && (
+                    <line 
+                      x1={hoveredPoint.x} 
+                      y1="25" 
+                      x2={hoveredPoint.x} 
+                      y2="145" 
+                      stroke="var(--accent)" 
+                      strokeWidth="1.5" 
+                      strokeDasharray="4" 
+                      opacity="0.8" 
+                    />
+                  )}
+
+                  {/* Data Points (Dots & Touch Hit Areas) */}
                   {chartPoints.map((p, idx) => (
                     <g 
                       key={idx} 
                       className="chart-dot-group" 
                       style={{ cursor: 'pointer' }}
-                      onMouseEnter={() => setHoveredPoint({ index: idx, label: monthsLabel[idx], value: p.val })}
+                      onMouseEnter={() => setHoveredPoint(p)}
+                      onClick={() => setHoveredPoint(p)}
+                      onTouchStart={() => setHoveredPoint(p)}
                     >
+                      {/* Invisible larger hit circle for easy touch/hover on mobile */}
+                      <circle cx={p.x} cy={p.y} r="18" fill="transparent" />
+
+                      {/* Visible dot */}
                       <circle 
                         cx={p.x} 
                         cy={p.y} 
-                        r={hoveredPoint && hoveredPoint.index === idx ? "6" : "4"} 
-                        fill={hoveredPoint && hoveredPoint.index === idx ? "var(--accent)" : "var(--bg-secondary)"} 
-                        stroke="var(--accent)" 
+                        r={hoveredPoint && hoveredPoint.index === idx ? "7" : p.val > 0 ? "5" : "3.5"} 
+                        fill={hoveredPoint && hoveredPoint.index === idx ? "var(--accent)" : p.val > 0 ? "var(--accent)" : "var(--bg-secondary)"} 
+                        stroke={p.val > 0 ? "#ffffff" : "var(--accent)"} 
                         strokeWidth="2.5" 
+                        style={{ transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
                       />
                     </g>
                   ))}
@@ -1600,52 +1783,83 @@ export default function App() {
                   {/* X Axis Month Labels */}
                   {chartPoints.map((p, idx) => {
                     // Prevent label overlap on daily/monthly views by skipping labels
-                    if (chartPeriod === 'monthly' && idx % 5 !== 0 && idx !== chartPoints.length - 1) {
+                    if (chartPeriod === 'monthly' && idx % 4 !== 0 && idx !== chartPoints.length - 1) {
                       return null;
                     }
                     return (
-                      <text key={idx} x={p.x} y="165" fill="var(--text-secondary)" fontSize="9" textAnchor="middle">
+                      <text 
+                        key={idx} 
+                        x={p.x} 
+                        y="165" 
+                        fill={hoveredPoint && hoveredPoint.index === idx ? "var(--accent)" : "var(--text-secondary)"} 
+                        fontSize="9.5" 
+                        fontWeight={hoveredPoint && hoveredPoint.index === idx ? "700" : "500"}
+                        textAnchor="middle"
+                        style={{ transition: 'all 0.2s' }}
+                      >
                         {monthsLabel[idx]}
                       </text>
                     );
                   })}
                 </svg>
+
+                {/* Floating Interactive Glassmorphism Tooltip */}
+                {hoveredPoint && (
+                  <div 
+                    className="chart-floating-tooltip"
+                    style={{
+                      left: `${(hoveredPoint.x / 500) * 100}%`,
+                      top: `${(hoveredPoint.y / 180) * 100}%`
+                    }}
+                  >
+                    <div className="tooltip-inner">
+                      <div className="tooltip-header">
+                        <span>📅 {hoveredPoint.label}</span>
+                        <span>{hoveredPoint.detail?.count || 0} Transaksi</span>
+                      </div>
+                      <div className="tooltip-amount">{formatRupiah(hoveredPoint.val)}</div>
+                      {hoveredPoint.detail && hoveredPoint.val > 0 && (
+                        <div className="tooltip-breakdown">
+                          {hoveredPoint.detail.membership > 0 && <div>🎫 Member: {formatRupiah(hoveredPoint.detail.membership)}</div>}
+                          {hoveredPoint.detail.daily > 0 && <div>🎟️ Harian: {formatRupiah(hoveredPoint.detail.daily)}</div>}
+                          {hoveredPoint.detail.store > 0 && <div>🥤 Toko: {formatRupiah(hoveredPoint.detail.store)}</div>}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {/* Detailed Tooltip Card below the chart */}
+              {/* Detailed Breakdown Card below the chart */}
               <div style={{ marginTop: '20px', padding: '16px', backgroundColor: 'var(--bg-tertiary)', borderRadius: '12px', border: '1px solid var(--border-color)', minHeight: '80px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 {!hoveredPoint ? (
                   <div style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', textAlign: 'center', margin: 'auto' }}>
-                    💡 Sorot (hover) titik pada grafik untuk melihat rincian keuangan detail.
+                    💡 Sorot (hover) atau sentuh titik tanggal pada grafik untuk melihat rincian pendapatan detail.
                   </div>
                 ) : (
                   <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '8px', marginBottom: '8px' }}>
-                      <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Periode: <strong>{hoveredPoint.label}</strong></span>
-                      <span style={{ fontSize: '0.9rem', color: 'var(--accent)', fontWeight: '700' }}>Total: {formatRupiah(hoveredPoint.value)}</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '8px', marginBottom: '8px', flexWrap: 'wrap', gap: '6px' }}>
+                      <span style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Periode: <strong style={{ color: 'var(--text-primary)' }}>{hoveredPoint.detail?.dateStr || hoveredPoint.label}</strong> ({hoveredPoint.detail?.count || 0} Transaksi)</span>
+                      <span style={{ fontSize: '1rem', color: 'var(--accent)', fontWeight: '800' }}>Total: {formatRupiah(hoveredPoint.val)}</span>
                     </div>
                     
                     {/* Itemized breakdown for hovered point */}
-                    {(() => {
-                      const breakdown = getPointBreakdown(hoveredPoint);
-                      if (!breakdown) return null;
-                      return (
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '16px', fontSize: '0.8rem', color: 'var(--text-primary)' }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <span>Membership:</span>
-                            <strong>{formatRupiah(breakdown.membership)}</strong>
-                          </div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <span>Kunjungan:</span>
-                            <strong>{formatRupiah(breakdown.daily)}</strong>
-                          </div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <span>Toko:</span>
-                            <strong>{formatRupiah(breakdown.store)}</strong>
-                          </div>
+                    {hoveredPoint.detail && (
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '12px', fontSize: '0.825rem', color: 'var(--text-primary)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 10px', background: 'var(--bg-secondary)', borderRadius: '6px' }}>
+                          <span style={{ color: 'var(--text-secondary)' }}>🎫 Membership:</span>
+                          <strong>{formatRupiah(hoveredPoint.detail.membership)}</strong>
                         </div>
-                      );
-                    })()}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 10px', background: 'var(--bg-secondary)', borderRadius: '6px' }}>
+                          <span style={{ color: 'var(--text-secondary)' }}>🎟️ Harian:</span>
+                          <strong>{formatRupiah(hoveredPoint.detail.daily)}</strong>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 10px', background: 'var(--bg-secondary)', borderRadius: '6px' }}>
+                          <span style={{ color: 'var(--text-secondary)' }}>🥤 Toko:</span>
+                          <strong>{formatRupiah(hoveredPoint.detail.store)}</strong>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -1980,7 +2194,7 @@ export default function App() {
                   value={dailySearch}
                   onChange={(e) => setDailySearch(e.target.value)}
                 />
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: '260px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: '320px', flexWrap: 'wrap' }}>
                   <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>Tarif Harian (Rp):</label>
                   <input 
                     type="number" 
@@ -1989,6 +2203,14 @@ export default function App() {
                     value={dailyPrice}
                     onChange={(e) => setDailyPrice(parseInt(e.target.value) || 0)}
                   />
+                  <button
+                    className="btn btn-primary"
+                    style={{ padding: '8px 14px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '5px' }}
+                    onClick={handleSaveDailyPrice}
+                    title="Tetapkan tarif dan sinkronkan ke semua perangkat"
+                  >
+                    {dailyPriceSaved ? '✓ Tersimpan' : '✓ Simpan'}
+                  </button>
                 </div>
               </div>
             </div>
@@ -2038,7 +2260,7 @@ export default function App() {
 
         {/* GYM STORE / TOKO TAB */}
         {activeTab === 'gym_store' && (
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }}>
+          <div className="store-layout-grid">
             {/* Products List */}
             <div className="card-table-wrapper">
               <div className="table-header">
@@ -2181,19 +2403,41 @@ export default function App() {
               <div>
                 <h2>Riwayat Transaksi</h2>
                 <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '2px' }}>
-                  Total: <strong>{transactions.length}</strong> transaksi ({formatRupiah(totalRevenue)})
+                  {(() => {
+                    const filtered = transactions.filter(t => {
+                      if (txFilterFrom && t.date < txFilterFrom) return false;
+                      if (txFilterTo && t.date > txFilterTo) return false;
+                      return true;
+                    });
+                    const total = filtered.reduce((sum, t) => sum + (t.amount || 0), 0);
+                    return <>Menampilkan: <strong>{filtered.length}</strong> transaksi ({formatRupiah(total)})</>;
+                  })()}
                 </p>
               </div>
-              {transactions.length > 0 && (
-                <button 
-                  className="btn btn-secondary" 
-                  style={{ color: 'var(--danger)', borderColor: 'var(--danger-bg)', fontSize: '0.8rem', padding: '6px 12px' }}
-                  onClick={handleClearAllTransactions}
-                  title="Hapus seluruh riwayat transaksi"
-                >
-                  🗑️ Reset Semua Transaksi
-                </button>
-              )}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <label style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>Dari:</label>
+                <input
+                  type="date"
+                  value={txFilterFrom}
+                  onChange={e => setTxFilterFrom(e.target.value)}
+                  style={{ fontSize: '0.82rem', padding: '5px 8px', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}
+                />
+                <label style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>Sampai:</label>
+                <input
+                  type="date"
+                  value={txFilterTo}
+                  onChange={e => setTxFilterTo(e.target.value)}
+                  style={{ fontSize: '0.82rem', padding: '5px 8px', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}
+                />
+                {(txFilterFrom || txFilterTo) && (
+                  <button
+                    onClick={() => { setTxFilterFrom(''); setTxFilterTo(''); }}
+                    style={{ fontSize: '0.78rem', padding: '5px 10px', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--danger)', cursor: 'pointer' }}
+                  >
+                    ✕ Reset
+                  </button>
+                )}
+              </div>
             </div>
             <div className="table-container">
               <table>
@@ -2210,15 +2454,21 @@ export default function App() {
                   </tr>
                 </thead>
                 <tbody>
-                  {[...transactions].reverse().length === 0 ? (
-                    <tr>
-                      <td colSpan="8" style={{ textAlign: 'center', padding: '36px', color: 'var(--text-secondary)' }}>
-                        <div style={{ fontSize: '1.8rem', marginBottom: '8px' }}>💳</div>
-                        Belum ada transaksi terekam. Kasir siap digunakan untuk transaksi baru!
-                      </td>
-                    </tr>
-                  ) : (
-                    [...transactions].reverse().map(t => (
+                  {(() => {
+                    const filtered = [...transactions].reverse().filter(t => {
+                      if (txFilterFrom && t.date < txFilterFrom) return false;
+                      if (txFilterTo && t.date > txFilterTo) return false;
+                      return true;
+                    });
+                    if (filtered.length === 0) return (
+                      <tr>
+                        <td colSpan="8" style={{ textAlign: 'center', padding: '36px', color: 'var(--text-secondary)' }}>
+                          <div style={{ fontSize: '1.8rem', marginBottom: '8px' }}>💳</div>
+                          {(txFilterFrom || txFilterTo) ? 'Tidak ada transaksi pada rentang tanggal tersebut.' : 'Belum ada transaksi terekam. Kasir siap digunakan untuk transaksi baru!'}
+                        </td>
+                      </tr>
+                    );
+                    return filtered.map(t => (
                       <tr key={t.id}>
                         <td><code>{t.id}</code></td>
                         <td><strong>{t.memberName}</strong></td>
@@ -2246,8 +2496,8 @@ export default function App() {
                           </button>
                         </td>
                       </tr>
-                    ))
-                  )}
+                    ));
+                  })()}
                 </tbody>
               </table>
             </div>

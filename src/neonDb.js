@@ -71,3 +71,28 @@ export async function deleteDailyVisitor(id) {
   const res = await api('deleteDailyVisitor', { id });
   return !!res?.success;
 }
+
+export async function savePackage(p) {
+  const res = await api('savePackage', p);
+  return !!res?.success;
+}
+
+export async function deletePackage(id) {
+  const res = await api('deletePackage', { id });
+  return !!res?.success;
+}
+
+export async function saveProduct(p) {
+  const res = await api('saveProduct', p);
+  return !!res?.success;
+}
+
+export async function deleteProduct(id) {
+  const res = await api('deleteProduct', { id });
+  return !!res?.success;
+}
+
+export async function saveSetting(key, value) {
+  const res = await api('saveSetting', { key, value });
+  return !!res?.success;
+}
