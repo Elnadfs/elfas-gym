@@ -119,38 +119,24 @@ export default function App() {
     return local ? JSON.parse(local) : [];
   });
 
-  // Sync to LocalStorage
+  // Sync lightweight configuration to LocalStorage safely
   useEffect(() => {
-    localStorage.setItem('gymfit_members', JSON.stringify(members));
-  }, [members]);
-
-  useEffect(() => {
-    localStorage.setItem('gymfit_packages', JSON.stringify(packages));
+    try {
+      localStorage.setItem('gymfit_packages', JSON.stringify(packages));
+    } catch (e) {}
   }, [packages]);
 
   useEffect(() => {
-    localStorage.setItem('gymfit_products', JSON.stringify(products));
+    try {
+      localStorage.setItem('gymfit_products', JSON.stringify(products));
+    } catch (e) {}
   }, [products]);
 
   useEffect(() => {
-    localStorage.setItem('gymfit_daily_visitors', JSON.stringify(dailyVisitors));
-  }, [dailyVisitors]);
-
-  useEffect(() => {
-    localStorage.setItem('gymfit_daily_price', dailyPrice);
+    try {
+      localStorage.setItem('gymfit_daily_price', dailyPrice);
+    } catch (e) {}
   }, [dailyPrice]);
-
-  useEffect(() => {
-    localStorage.setItem('gymfit_transactions', JSON.stringify(transactions));
-  }, [transactions]);
-
-  useEffect(() => {
-    localStorage.setItem('gymfit_expenses', JSON.stringify(expenses));
-  }, [expenses]);
-
-  useEffect(() => {
-    localStorage.setItem('gymfit_attendance_logs', JSON.stringify(attendanceLogs));
-  }, [attendanceLogs]);
 
   // Authentication State with 1-Hour Session Expiry (3600000 ms)
   const SESSION_DURATION_MS = 60 * 60 * 1000; // 1 Jam
@@ -377,8 +363,22 @@ export default function App() {
     price: 0
   });
 
+  // Transactions Search & Pagination State
   const [txFilterFrom, setTxFilterFrom] = useState('');
   const [txFilterTo, setTxFilterTo] = useState('');
+  const [txSearch, setTxSearch] = useState('');
+  const [txCategoryFilter, setTxCategoryFilter] = useState('all');
+  const [txPage, setTxPage] = useState(1);
+  const [txPageSize, setTxPageSize] = useState(25);
+
+  // Daily Visitors Search & Pagination State
+  const [dailyFilterDate, setDailyFilterDate] = useState('');
+  const [dailyPage, setDailyPage] = useState(1);
+  const [dailyPageSize, setDailyPageSize] = useState(25);
+
+  // Expenses Search & Pagination State
+  const [expensePage, setExpensePage] = useState(1);
+  const [expensePageSize, setExpensePageSize] = useState(25);
 
   const [dailyForm, setDailyForm] = useState({
     id: '',
@@ -2536,80 +2536,171 @@ export default function App() {
         })()}
 
         {/* DAILY VISITORS TAB */}
-        {activeTab === 'daily_visitors' && (
-          <div className="card-table-wrapper">
-            <div className="table-header">
-              <div className="table-search" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <input 
-                  type="text" 
-                  className="search-input" 
-                  placeholder="Cari pengunjung harian..."
-                  value={dailySearch}
-                  onChange={(e) => setDailySearch(e.target.value)}
-                />
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: '320px', flexWrap: 'wrap' }}>
-                  <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>Tarif Harian (Rp):</label>
+        {activeTab === 'daily_visitors' && (() => {
+          const s = dailySearch.toLowerCase();
+          const filteredDaily = dailyVisitors.filter(d => {
+            const matchesSearch = !s || (d.name && d.name.toLowerCase().includes(s)) || (d.phone && d.phone.includes(s)) || (d.id && d.id.toLowerCase().includes(s));
+            const matchesDate = !dailyFilterDate || d.date === dailyFilterDate;
+            return matchesSearch && matchesDate;
+          });
+
+          const totalPages = Math.max(1, Math.ceil(filteredDaily.length / dailyPageSize));
+          const safePage = Math.min(dailyPage, totalPages);
+          const startIndex = (safePage - 1) * dailyPageSize;
+          const paginatedDaily = filteredDaily.slice(startIndex, startIndex + dailyPageSize);
+
+          return (
+            <div className="card-table-wrapper">
+              <div className="table-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', flex: '1 1 320px' }}>
                   <input 
-                    type="number" 
+                    type="text" 
                     className="search-input" 
-                    style={{ maxWidth: '120px', padding: '8px 12px' }}
-                    value={dailyPrice}
-                    onChange={(e) => setDailyPrice(parseInt(e.target.value) || 0)}
+                    placeholder="Cari pengunjung (Nama, ID, No Telp)..."
+                    value={dailySearch}
+                    onChange={(e) => {
+                      setDailySearch(e.target.value);
+                      setDailyPage(1);
+                    }}
+                    style={{ maxWidth: '280px' }}
                   />
-                  <button
-                    className="btn btn-primary"
-                    style={{ padding: '8px 14px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '5px' }}
-                    onClick={handleSaveDailyPrice}
-                    title="Tetapkan tarif dan sinkronkan ke semua perangkat"
-                  >
-                    {dailyPriceSaved ? '✓ Tersimpan' : '✓ Simpan'}
-                  </button>
+                  <input 
+                    type="date" 
+                    className="search-input"
+                    value={dailyFilterDate}
+                    onChange={(e) => {
+                      setDailyFilterDate(e.target.value);
+                      setDailyPage(1);
+                    }}
+                    style={{ width: 'auto', minWidth: '150px' }}
+                    title="Filter Tanggal Kunjungan"
+                  />
+                  {dailyFilterDate && (
+                    <button
+                      className="btn-clear-filter"
+                      onClick={() => { setDailyFilterDate(''); setDailyPage(1); }}
+                    >
+                      ✕ Reset Tanggal
+                    </button>
+                  )}
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                    <span>Baris:</span>
+                    <select 
+                      className="select-input" 
+                      style={{ padding: '6px 8px', fontSize: '0.85rem', width: 'auto' }}
+                      value={dailyPageSize}
+                      onChange={(e) => {
+                        setDailyPageSize(Number(e.target.value));
+                        setDailyPage(1);
+                      }}
+                    >
+                      <option value={25}>25</option>
+                      <option value={50}>50</option>
+                      <option value={100}>100</option>
+                      <option value={200}>200</option>
+                    </select>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'var(--bg-secondary)', padding: '4px 10px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                    <label style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>Tarif (Rp):</label>
+                    <input 
+                      type="number" 
+                      className="search-input" 
+                      style={{ maxWidth: '90px', padding: '4px 8px', minHeight: '32px', fontSize: '0.85rem' }}
+                      value={dailyPrice}
+                      onChange={(e) => setDailyPrice(parseInt(e.target.value) || 0)}
+                    />
+                    <button
+                      className="btn btn-primary"
+                      style={{ padding: '4px 10px', fontSize: '0.8rem', minHeight: '32px' }}
+                      onClick={handleSaveDailyPrice}
+                    >
+                      {dailyPriceSaved ? '✓' : 'Simpan'}
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="table-container">
-              <table>
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Nama</th>
-                    <th>Telepon</th>
-                    <th>Tanggal Kunjungan</th>
-                    <th>Pembayaran</th>
-                    <th>Aksi</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {dailyVisitors.filter(d => d.name.toLowerCase().includes(dailySearch.toLowerCase()) || d.phone.includes(dailySearch)).length === 0 ? (
+
+              <div className="table-container">
+                <table>
+                  <thead>
                     <tr>
-                      <td colSpan="6" style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>
-                        Tidak ada riwayat kunjungan harian yang cocok.
-                      </td>
+                      <th>ID</th>
+                      <th>Nama</th>
+                      <th>Telepon</th>
+                      <th>Tanggal Kunjungan</th>
+                      <th>Pembayaran</th>
+                      <th>Aksi</th>
                     </tr>
-                  ) : (
-                    dailyVisitors.filter(d => d.name.toLowerCase().includes(dailySearch.toLowerCase()) || d.phone.includes(dailySearch)).map(d => (
-                      <tr key={d.id}>
-                        <td><code>{d.id}</code></td>
-                        <td><strong>{d.name}</strong></td>
-                        <td>{d.phone}</td>
-                        <td>{d.date}</td>
-                        <td><strong style={{ color: 'var(--success)' }}>{formatRupiah(d.amountPaid)}</strong></td>
-                        <td>
-                          <button className="action-btn" onClick={() => handleOpenEditDaily(d)} title="Edit">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                          </button>
-                          <button className="action-btn delete" onClick={() => handleDeleteDaily(d.id)} title="Hapus">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                          </button>
+                  </thead>
+                  <tbody>
+                    {paginatedDaily.length === 0 ? (
+                      <tr>
+                        <td colSpan="6" style={{ textAlign: 'center', padding: '32px', color: 'var(--text-secondary)' }}>
+                          Tidak ada riwayat kunjungan harian yang cocok.
                         </td>
                       </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+                    ) : (
+                      paginatedDaily.map(d => (
+                        <tr key={d.id}>
+                          <td><code>{d.id}</code></td>
+                          <td><strong>{d.name}</strong></td>
+                          <td>{d.phone || '-'}</td>
+                          <td>{d.date}</td>
+                          <td><strong style={{ color: 'var(--success)' }}>{formatRupiah(d.amountPaid)}</strong></td>
+                          <td>
+                            <button className="action-btn" onClick={() => handleOpenEditDaily(d)} title="Edit">
+                              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                            </button>
+                            <button className="action-btn delete" onClick={() => handleDeleteDaily(d.id)} title="Hapus">
+                              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Pagination Footer */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 0 8px 0', borderTop: '1px solid var(--border-color)', marginTop: '16px', flexWrap: 'wrap', gap: '12px' }}>
+                <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                  Menampilkan <strong>{filteredDaily.length === 0 ? 0 : startIndex + 1}</strong> - <strong>{Math.min(startIndex + dailyPageSize, filteredDaily.length)}</strong> dari <strong>{filteredDaily.length.toLocaleString('id-ID')}</strong> pengunjung harian
+                </div>
+
+                {totalPages > 1 && (
+                  <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                    <button 
+                      className="btn btn-secondary" 
+                      style={{ padding: '6px 10px', fontSize: '0.8rem' }}
+                      disabled={safePage <= 1}
+                      onClick={() => setDailyPage(prev => Math.max(1, prev - 1))}
+                    >
+                      ◀ Prev
+                    </button>
+                    
+                    <span style={{ fontSize: '0.85rem', color: 'var(--text-primary)', padding: '0 8px' }}>
+                      Hal <strong>{safePage}</strong> / <strong>{totalPages}</strong>
+                    </span>
+
+                    <button 
+                      className="btn btn-secondary" 
+                      style={{ padding: '6px 10px', fontSize: '0.8rem' }}
+                      disabled={safePage >= totalPages}
+                      onClick={() => setDailyPage(prev => Math.min(totalPages, prev + 1))}
+                    >
+                      Next ▶
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* GYM STORE / TOKO TAB */}
         {activeTab === 'gym_store' && (
@@ -2750,183 +2841,336 @@ export default function App() {
         )}
 
         {/* TRANSACTIONS TAB */}
-        {activeTab === 'transactions' && (
-          <div className="card-table-wrapper">
-            <div className="table-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-              <div>
-                <h2>Riwayat Transaksi</h2>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '2px' }}>
-                  {(() => {
-                    const filtered = transactions.filter(t => {
-                      if (txFilterFrom && t.date < txFilterFrom) return false;
-                      if (txFilterTo && t.date > txFilterTo) return false;
-                      return true;
-                    });
-                    const total = filtered.reduce((sum, t) => sum + (t.amount || 0), 0);
-                    return <>Menampilkan: <strong>{filtered.length}</strong> transaksi ({formatRupiah(total)})</>;
-                  })()}
-                </p>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                <label style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>Dari:</label>
-                <input
-                  type="date"
-                  value={txFilterFrom}
-                  onChange={e => setTxFilterFrom(e.target.value)}
-                  style={{ fontSize: '0.82rem', padding: '5px 8px', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}
-                />
-                <label style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>Sampai:</label>
-                <input
-                  type="date"
-                  value={txFilterTo}
-                  onChange={e => setTxFilterTo(e.target.value)}
-                  style={{ fontSize: '0.82rem', padding: '5px 8px', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}
-                />
-                {(txFilterFrom || txFilterTo) && (
-                  <button
-                    onClick={() => { setTxFilterFrom(''); setTxFilterTo(''); }}
-                    style={{ fontSize: '0.78rem', padding: '5px 10px', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--danger)', cursor: 'pointer' }}
+        {activeTab === 'transactions' && (() => {
+          const s = txSearch.toLowerCase();
+          const filteredTx = transactions.filter(t => {
+            if (txFilterFrom && t.date < txFilterFrom) return false;
+            if (txFilterTo && t.date > txFilterTo) return false;
+            if (txCategoryFilter !== 'all') {
+              if (txCategoryFilter === 'member' && !isMembershipTx(t)) return false;
+              if (txCategoryFilter === 'daily' && !isDailyTx(t)) return false;
+              if (txCategoryFilter === 'store' && !isStoreTx(t)) return false;
+            }
+            if (s) {
+              const nameMatch = t.memberName && t.memberName.toLowerCase().includes(s);
+              const idMatch = t.id && t.id.toLowerCase().includes(s);
+              const descMatch = t.desc && t.desc.toLowerCase().includes(s);
+              const methodMatch = t.paymentMethod && t.paymentMethod.toLowerCase().includes(s);
+              if (!nameMatch && !idMatch && !descMatch && !methodMatch) return false;
+            }
+            return true;
+          });
+
+          const totalAmount = filteredTx.reduce((sum, t) => sum + (t.amount || 0), 0);
+          const totalPages = Math.max(1, Math.ceil(filteredTx.length / txPageSize));
+          const safePage = Math.min(txPage, totalPages);
+          const startIndex = (safePage - 1) * txPageSize;
+          const paginatedTx = filteredTx.slice(startIndex, startIndex + txPageSize);
+
+          return (
+            <div className="card-table-wrapper">
+              <div className="table-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
+                <div>
+                  <h2>Riwayat Transaksi</h2>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '2px' }}>
+                    Ditemukan: <strong>{filteredTx.length.toLocaleString('id-ID')}</strong> transaksi ({formatRupiah(totalAmount)})
+                  </p>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                  <input 
+                    type="text" 
+                    className="search-input" 
+                    placeholder="Cari transaksi (Nama, ID, Deskripsi)..."
+                    value={txSearch}
+                    onChange={(e) => {
+                      setTxSearch(e.target.value);
+                      setTxPage(1);
+                    }}
+                    style={{ maxWidth: '240px' }}
+                  />
+
+                  <select 
+                    className="select-input" 
+                    style={{ maxWidth: '160px' }}
+                    value={txCategoryFilter}
+                    onChange={(e) => {
+                      setTxCategoryFilter(e.target.value);
+                      setTxPage(1);
+                    }}
                   >
-                    ✕ Reset
-                  </button>
-                )}
+                    <option value="all">Semua Kategori</option>
+                    <option value="member">🎫 Membership</option>
+                    <option value="daily">🎟️ Kunjungan Harian</option>
+                    <option value="store">🥤 Toko Gym</option>
+                  </select>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <input
+                      type="date"
+                      value={txFilterFrom}
+                      onChange={e => { setTxFilterFrom(e.target.value); setTxPage(1); }}
+                      style={{ fontSize: '0.82rem', padding: '5px 8px', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}
+                      title="Dari Tanggal"
+                    />
+                    <span style={{ color: 'var(--text-muted)' }}>s/d</span>
+                    <input
+                      type="date"
+                      value={txFilterTo}
+                      onChange={e => { setTxFilterTo(e.target.value); setTxPage(1); }}
+                      style={{ fontSize: '0.82rem', padding: '5px 8px', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}
+                      title="Sampai Tanggal"
+                    />
+                  </div>
+
+                  {(txFilterFrom || txFilterTo || txSearch || txCategoryFilter !== 'all') && (
+                    <button
+                      className="btn-clear-filter"
+                      onClick={() => { setTxFilterFrom(''); setTxFilterTo(''); setTxSearch(''); setTxCategoryFilter('all'); setTxPage(1); }}
+                    >
+                      ✕ Reset
+                    </button>
+                  )}
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                    <span>Baris:</span>
+                    <select 
+                      className="select-input" 
+                      style={{ padding: '6px 8px', fontSize: '0.85rem', width: 'auto' }}
+                      value={txPageSize}
+                      onChange={(e) => {
+                        setTxPageSize(Number(e.target.value));
+                        setTxPage(1);
+                      }}
+                    >
+                      <option value={25}>25</option>
+                      <option value={50}>50</option>
+                      <option value={100}>100</option>
+                      <option value={200}>200</option>
+                    </select>
+                  </div>
+                </div>
               </div>
-            </div>
-            <div className="table-container">
-              <table>
-                <thead>
-                  <tr>
-                    <th>ID Transaksi</th>
-                    <th>Nama Pelanggan</th>
-                    <th>Kategori</th>
-                    <th>Deskripsi Belanja</th>
-                    <th>Tanggal Bayar</th>
-                    <th>Metode</th>
-                    <th>Jumlah Pembayaran</th>
-                    <th style={{ textAlign: 'center' }}>Aksi</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(() => {
-                    const filtered = [...transactions].reverse().filter(t => {
-                      if (txFilterFrom && t.date < txFilterFrom) return false;
-                      if (txFilterTo && t.date > txFilterTo) return false;
-                      return true;
-                    });
-                    if (filtered.length === 0) return (
+
+              <div className="table-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>ID Transaksi</th>
+                      <th>Nama Pelanggan</th>
+                      <th>Kategori</th>
+                      <th>Deskripsi Belanja</th>
+                      <th>Tanggal Bayar</th>
+                      <th>Metode</th>
+                      <th>Jumlah Pembayaran</th>
+                      <th style={{ textAlign: 'center' }}>Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {paginatedTx.length === 0 ? (
                       <tr>
                         <td colSpan="8" style={{ textAlign: 'center', padding: '36px', color: 'var(--text-secondary)' }}>
                           <div style={{ fontSize: '1.8rem', marginBottom: '8px' }}>💳</div>
-                          {(txFilterFrom || txFilterTo) ? 'Tidak ada transaksi pada rentang tanggal tersebut.' : 'Belum ada transaksi terekam. Kasir siap digunakan untuk transaksi baru!'}
+                          Tidak ada transaksi yang cocok dengan filter pencarian.
                         </td>
                       </tr>
-                    );
-                    return filtered.map(t => (
-                      <tr key={t.id}>
-                        <td><code>{t.id}</code></td>
-                        <td><strong>{t.memberName}</strong></td>
-                        <td>
-                          <span className={`badge ${t.type === 'Membership' ? 'badge-active' : t.type === 'Kunjungan Harian' ? 'badge-pending' : 'badge-expired'}`}>
-                            {t.type}
-                          </span>
-                        </td>
-                        <td>{t.desc}</td>
-                        <td>{t.date}</td>
-                        <td>
-                          <span className={`badge ${t.paymentMethod === 'QRIS' ? 'badge-active' : 'badge-pending'}`} style={{ fontSize: '0.75rem' }}>
-                            {t.paymentMethod || 'Cash'}
-                          </span>
-                        </td>
-                        <td><strong style={{ color: 'var(--success)' }}>{formatRupiah(t.amount)}</strong></td>
-                        <td style={{ textAlign: 'center' }}>
-                          <button 
-                            className="action-btn delete" 
-                            style={{ padding: '4px 6px' }}
-                            onClick={() => handleDeleteTransaction(t.id)} 
-                            title="Hapus Transaksi"
-                          >
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                          </button>
-                        </td>
-                      </tr>
-                    ));
-                  })()}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-
-        {/* EXPENSES TAB */}
-        {activeTab === 'expenses' && (
-          <div className="card-table-wrapper">
-            <div className="table-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', marginBottom: '24px' }}>
-              <h2>Daftar Catatan Pengeluaran</h2>
-              <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                <input 
-                  type="text" 
-                  className="form-control" 
-                  placeholder="Cari deskripsi pengeluaran..." 
-                  style={{ width: '250px', padding: '8px 12px', fontSize: '0.85rem' }}
-                  value={expenseSearch}
-                  onChange={(e) => setExpenseSearch(e.target.value)}
-                />
-                <button className="btn btn-primary" onClick={handleOpenAddExpense} style={{ padding: '8px 16px', fontSize: '0.85rem' }}>
-                  + Catat Pengeluaran
-                </button>
-              </div>
-            </div>
-            <div className="table-container">
-              <table>
-                <thead>
-                  <tr>
-                    <th>ID Pengeluaran</th>
-                    <th>Deskripsi Pengeluaran</th>
-                    <th>Tanggal Pengeluaran</th>
-                    <th>Metode Pembayaran</th>
-                    <th>Jumlah Nominal</th>
-                    <th>Aksi</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(() => {
-                    const filteredList = expenses.filter(exp => 
-                      exp.desc.toLowerCase().includes(expenseSearch.toLowerCase())
-                    );
-                    if (filteredList.length === 0) {
-                      return (
-                        <tr>
-                          <td colSpan="6" style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>
-                            Tidak ada data pengeluaran ditemukan.
+                    ) : (
+                      paginatedTx.map(t => (
+                        <tr key={t.id}>
+                          <td><code>{t.id}</code></td>
+                          <td><strong>{t.memberName}</strong></td>
+                          <td>
+                            <span className={`badge ${isMembershipTx(t) ? 'badge-active' : isDailyTx(t) ? 'badge-pending' : 'badge-expired'}`}>
+                              {isMembershipTx(t) ? 'Membership' : isDailyTx(t) ? 'Kunjungan Harian' : 'Toko'}
+                            </span>
+                          </td>
+                          <td>{t.desc}</td>
+                          <td>{t.date}</td>
+                          <td>
+                            <span className={`badge ${t.paymentMethod === 'QRIS' || t.paymentMethod === 'qris' || t.paymentMethod === 'Transfer' ? 'badge-active' : 'badge-pending'}`} style={{ fontSize: '0.75rem' }}>
+                              {t.paymentMethod || 'Cash'}
+                            </span>
+                          </td>
+                          <td><strong style={{ color: 'var(--success)' }}>{formatRupiah(t.amount)}</strong></td>
+                          <td style={{ textAlign: 'center' }}>
+                            <button 
+                              className="action-btn delete" 
+                              style={{ padding: '4px 6px' }}
+                              onClick={() => handleDeleteTransaction(t.id)} 
+                              title="Hapus Transaksi"
+                            >
+                              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                            </button>
                           </td>
                         </tr>
-                      );
-                    }
-                    return [...filteredList].reverse().map(exp => (
-                      <tr key={exp.id}>
-                        <td><code>{exp.id}</code></td>
-                        <td><strong>{exp.desc}</strong></td>
-                        <td>{exp.date}</td>
-                        <td>
-                          <span className={`badge ${exp.paymentMethod === 'QRIS' ? 'badge-active' : 'badge-pending'}`} style={{ fontSize: '0.75rem' }}>
-                            {exp.paymentMethod || 'Cash'}
-                          </span>
-                        </td>
-                        <td><strong style={{ color: 'var(--danger)' }}>-{formatRupiah(exp.amount)}</strong></td>
-                        <td>
-                          <div style={{ display: 'flex', gap: '8px' }}>
-                            <button className="action-btn" onClick={() => handleOpenEditExpense(exp)} title="Edit">✏️</button>
-                            <button className="action-btn delete" onClick={() => handleDeleteExpense(exp.id)} title="Hapus">🗑️</button>
-                          </div>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Pagination Footer */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 0 8px 0', borderTop: '1px solid var(--border-color)', marginTop: '16px', flexWrap: 'wrap', gap: '12px' }}>
+                <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                  Menampilkan <strong>{filteredTx.length === 0 ? 0 : startIndex + 1}</strong> - <strong>{Math.min(startIndex + txPageSize, filteredTx.length)}</strong> dari <strong>{filteredTx.length.toLocaleString('id-ID')}</strong> transaksi
+                </div>
+
+                {totalPages > 1 && (
+                  <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                    <button 
+                      className="btn btn-secondary" 
+                      style={{ padding: '6px 10px', fontSize: '0.8rem' }}
+                      disabled={safePage <= 1}
+                      onClick={() => setTxPage(prev => Math.max(1, prev - 1))}
+                    >
+                      ◀ Prev
+                    </button>
+                    
+                    <span style={{ fontSize: '0.85rem', color: 'var(--text-primary)', padding: '0 8px' }}>
+                      Hal <strong>{safePage}</strong> / <strong>{totalPages}</strong>
+                    </span>
+
+                    <button 
+                      className="btn btn-secondary" 
+                      style={{ padding: '6px 10px', fontSize: '0.8rem' }}
+                      disabled={safePage >= totalPages}
+                      onClick={() => setTxPage(prev => Math.min(totalPages, prev + 1))}
+                    >
+                      Next ▶
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* EXPENSES TAB */}
+        {activeTab === 'expenses' && (() => {
+          const filteredList = expenses.filter(exp => 
+            exp.desc.toLowerCase().includes(expenseSearch.toLowerCase())
+          );
+          const totalPages = Math.max(1, Math.ceil(filteredList.length / expensePageSize));
+          const safePage = Math.min(expensePage, totalPages);
+          const startIndex = (safePage - 1) * expensePageSize;
+          const paginatedExpenses = filteredList.slice(startIndex, startIndex + expensePageSize);
+
+          return (
+            <div className="card-table-wrapper">
+              <div className="table-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', marginBottom: '24px' }}>
+                <h2>Daftar Catatan Pengeluaran</h2>
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <input 
+                    type="text" 
+                    className="form-control" 
+                    placeholder="Cari deskripsi pengeluaran..." 
+                    style={{ width: '250px', padding: '8px 12px', fontSize: '0.85rem' }}
+                    value={expenseSearch}
+                    onChange={(e) => {
+                      setExpenseSearch(e.target.value);
+                      setExpensePage(1);
+                    }}
+                  />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                    <span>Baris:</span>
+                    <select 
+                      className="select-input" 
+                      style={{ padding: '6px 8px', fontSize: '0.85rem', width: 'auto' }}
+                      value={expensePageSize}
+                      onChange={(e) => {
+                        setExpensePageSize(Number(e.target.value));
+                        setExpensePage(1);
+                      }}
+                    >
+                      <option value={25}>25</option>
+                      <option value={50}>50</option>
+                      <option value={100}>100</option>
+                    </select>
+                  </div>
+                  <button className="btn btn-primary" onClick={handleOpenAddExpense} style={{ padding: '8px 16px', fontSize: '0.85rem' }}>
+                    + Catat Pengeluaran
+                  </button>
+                </div>
+              </div>
+              <div className="table-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>ID Pengeluaran</th>
+                      <th>Deskripsi Pengeluaran</th>
+                      <th>Tanggal Pengeluaran</th>
+                      <th>Metode Pembayaran</th>
+                      <th>Jumlah Nominal</th>
+                      <th>Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {paginatedExpenses.length === 0 ? (
+                      <tr>
+                        <td colSpan="6" style={{ textAlign: 'center', padding: '32px', color: 'var(--text-secondary)' }}>
+                          Tidak ada data pengeluaran ditemukan.
                         </td>
                       </tr>
-                    ));
-                  })()}
-                </tbody>
-              </table>
+                    ) : (
+                      paginatedExpenses.map(exp => (
+                        <tr key={exp.id}>
+                          <td><code>{exp.id}</code></td>
+                          <td><strong>{exp.desc}</strong></td>
+                          <td>{exp.date}</td>
+                          <td>
+                            <span className={`badge ${exp.paymentMethod === 'QRIS' || exp.paymentMethod === 'qris' || exp.paymentMethod === 'Transfer' ? 'badge-active' : 'badge-pending'}`} style={{ fontSize: '0.75rem' }}>
+                              {exp.paymentMethod || 'Cash'}
+                            </span>
+                          </td>
+                          <td><strong style={{ color: 'var(--danger)' }}>-{formatRupiah(exp.amount)}</strong></td>
+                          <td>
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                              <button className="action-btn" onClick={() => handleOpenEditExpense(exp)} title="Edit">✏️</button>
+                              <button className="action-btn delete" onClick={() => handleDeleteExpense(exp.id)} title="Hapus">🗑️</button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Pagination Footer */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 0 8px 0', borderTop: '1px solid var(--border-color)', marginTop: '16px', flexWrap: 'wrap', gap: '12px' }}>
+                <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                  Menampilkan <strong>{filteredList.length === 0 ? 0 : startIndex + 1}</strong> - <strong>{Math.min(startIndex + expensePageSize, filteredList.length)}</strong> dari <strong>{filteredList.length}</strong> pengeluaran
+                </div>
+
+                {totalPages > 1 && (
+                  <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                    <button 
+                      className="btn btn-secondary" 
+                      style={{ padding: '6px 10px', fontSize: '0.8rem' }}
+                      disabled={safePage <= 1}
+                      onClick={() => setExpensePage(prev => Math.max(1, prev - 1))}
+                    >
+                      ◀ Prev
+                    </button>
+                    
+                    <span style={{ fontSize: '0.85rem', color: 'var(--text-primary)', padding: '0 8px' }}>
+                      Hal <strong>{safePage}</strong> / <strong>{totalPages}</strong>
+                    </span>
+
+                    <button 
+                      className="btn btn-secondary" 
+                      style={{ padding: '6px 10px', fontSize: '0.8rem' }}
+                      disabled={safePage >= totalPages}
+                      onClick={() => setExpensePage(prev => Math.min(totalPages, prev + 1))}
+                    >
+                      Next ▶
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* REPORTS TAB */}
         {activeTab === 'reports' && (
