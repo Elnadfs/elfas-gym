@@ -1257,3 +1257,26 @@ tr:hover td {
   border-color: rgba(245, 158, 11, 0.2);
 }
 
+.stat-tag.danger {
+  background: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+@media print {
+  aside, .no-print, .btn, .overview-filter-bar, .mobile-header-bar {
+    display: none !important;
+  }
+  main {
+    margin: 0 !important;
+    padding: 10px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .card-table-wrapper, .card-stat {
+    break-inside: avoid;
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+  }
+}
+

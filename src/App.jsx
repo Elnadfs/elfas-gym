@@ -417,31 +417,34 @@ export default function App() {
 
   // Date Filtering Helper
   const isInPeriod = (dateStr, period) => {
+    if (!dateStr) return false;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const targetDate = new Date(dateStr);
-    targetDate.setHours(0, 0, 0, 0);
+    const todayStr = formatLocalDateStr(today);
+
+    if (period === 'all') return true;
 
     if (period === 'today') {
-      return targetDate.getTime() === today.getTime();
+      return dateStr === todayStr;
     }
     if (period === 'week') {
       const oneWeekAgo = new Date(today);
       oneWeekAgo.setDate(today.getDate() - 7);
-      return targetDate >= oneWeekAgo && targetDate <= today;
+      const oneWeekAgoStr = formatLocalDateStr(oneWeekAgo);
+      return dateStr >= oneWeekAgoStr && dateStr <= todayStr;
     }
     if (period === 'month') {
-      return targetDate.getMonth() === today.getMonth() && targetDate.getFullYear() === today.getFullYear();
+      const currentMonthPrefix = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+      return dateStr.startsWith(currentMonthPrefix);
     }
     if (period === 'year') {
-      return targetDate.getFullYear() === today.getFullYear();
+      return dateStr.startsWith(`${today.getFullYear()}`);
     }
     if (period === 'custom') {
-      const start = new Date(customStartDate);
-      start.setHours(0, 0, 0, 0);
-      const end = new Date(customEndDate);
-      end.setHours(23, 59, 59, 999);
-      return targetDate >= start && targetDate <= end;
+      return dateStr >= customStartDate && dateStr <= customEndDate;
+    }
+    if (period.match(/^\d{4}-\d{2}$/)) {
+      return dateStr.startsWith(period);
     }
     return true;
   };
@@ -638,8 +641,24 @@ export default function App() {
   const netProfit = totalRevenue - totalExpenses;
 
   const filteredExpenses = expenses.filter(e => isInPeriod(e.date, reportPeriod));
-  const periodExpenses = filteredExpenses.reduce((acc, curr) => acc + curr.amount, 0);
+  const periodExpenses = filteredExpenses.reduce((acc, curr) => acc + (curr.amount || 0), 0);
   const periodNetProfit = periodRevenue - periodExpenses;
+
+  const periodCashExpenses = filteredExpenses.filter(e => e.paymentMethod?.toLowerCase() === 'cash' || !e.paymentMethod).reduce((acc, curr) => acc + (curr.amount || 0), 0);
+  const periodNonCashExpenses = filteredExpenses.filter(e => e.paymentMethod?.toLowerCase() === 'qris' || e.paymentMethod?.toLowerCase() === 'transfer' || e.paymentMethod === 'ATM').reduce((acc, curr) => acc + (curr.amount || 0), 0);
+  const profitMarginPercent = periodRevenue > 0 ? ((periodNetProfit / periodRevenue) * 100).toFixed(1) : 0;
+  const expenseRatioPercent = periodRevenue > 0 ? ((periodExpenses / periodRevenue) * 100).toFixed(1) : 0;
+
+  const reportPeriodLabel = (() => {
+    if (reportPeriod === 'today') return 'Hari Ini';
+    if (reportPeriod === 'week') return '7 Hari Terakhir';
+    if (reportPeriod === 'month') return `Bulan Ini (${formatMonthLabel(currentMonthStr)})`;
+    if (reportPeriod === 'year') return `Tahun Ini (${new Date().getFullYear()})`;
+    if (reportPeriod === 'all') return 'Semua Waktu';
+    if (reportPeriod === 'custom') return `${customStartDate} s/d ${customEndDate}`;
+    if (reportPeriod.match(/^\d{4}-\d{2}$/)) return formatMonthLabel(reportPeriod);
+    return reportPeriod;
+  })();
 
   // CRUD Member Actions
   const handleOpenAddMember = () => {
@@ -2891,69 +2910,93 @@ export default function App() {
           </div>
         )}
 
-        {/* REPORTS & RECAPS TAB */}
+        {/* REPORTS TAB */}
         {activeTab === 'reports' && (
           <div>
             {/* Filter Timeframe & Print Row */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }} className="no-print">
-              <div style={{ display: 'flex', gap: '10px', backgroundColor: 'var(--bg-secondary)', padding: '8px', borderRadius: '12px', width: 'fit-content', border: '1px solid var(--border-color)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '14px' }} className="no-print">
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
                 <button 
-                className={`btn ${reportPeriod === 'today' ? 'btn-primary' : 'btn-secondary'}`}
-                style={{ padding: '8px 16px', fontSize: '0.8rem' }}
-                onClick={() => setReportPeriod('today')}
-              >
-                Hari Ini
-              </button>
-              <button 
-                className={`btn ${reportPeriod === 'week' ? 'btn-primary' : 'btn-secondary'}`}
-                style={{ padding: '8px 16px', fontSize: '0.8rem' }}
-                onClick={() => setReportPeriod('week')}
-              >
-                Minggu Ini
-              </button>
-              <button 
-                className={`btn ${reportPeriod === 'month' ? 'btn-primary' : 'btn-secondary'}`}
-                style={{ padding: '8px 16px', fontSize: '0.8rem' }}
-                onClick={() => setReportPeriod('month')}
-              >
-                Bulan Ini
-              </button>
-              <button 
-                className={`btn ${reportPeriod === 'year' ? 'btn-primary' : 'btn-secondary'}`}
-                style={{ padding: '8px 16px', fontSize: '0.8rem' }}
-                onClick={() => setReportPeriod('year')}
-              >
-                Tahun Ini
-              </button>
-              <button 
-                className={`btn ${reportPeriod === 'custom' ? 'btn-primary' : 'btn-secondary'}`}
-                style={{ padding: '8px 16px', fontSize: '0.8rem' }}
-                onClick={() => setReportPeriod('custom')}
-              >
-                Pilih Tanggal
-              </button>
+                  className={`btn ${reportPeriod === 'today' ? 'btn-primary' : 'btn-secondary'}`}
+                  style={{ padding: '7px 14px', fontSize: '0.82rem' }}
+                  onClick={() => setReportPeriod('today')}
+                >
+                  ⚡ Hari Ini
+                </button>
+                <button 
+                  className={`btn ${reportPeriod === 'week' ? 'btn-primary' : 'btn-secondary'}`}
+                  style={{ padding: '7px 14px', fontSize: '0.82rem' }}
+                  onClick={() => setReportPeriod('week')}
+                >
+                  📅 7 Hari Terakhir
+                </button>
+                <button 
+                  className={`btn ${reportPeriod === 'month' ? 'btn-primary' : 'btn-secondary'}`}
+                  style={{ padding: '7px 14px', fontSize: '0.82rem' }}
+                  onClick={() => setReportPeriod('month')}
+                >
+                  🗓️ Bulan Ini
+                </button>
+                <button 
+                  className={`btn ${reportPeriod === 'year' ? 'btn-primary' : 'btn-secondary'}`}
+                  style={{ padding: '7px 14px', fontSize: '0.82rem' }}
+                  onClick={() => setReportPeriod('year')}
+                >
+                  📊 Tahun Ini
+                </button>
+                <button 
+                  className={`btn ${reportPeriod === 'all' ? 'btn-primary' : 'btn-secondary'}`}
+                  style={{ padding: '7px 14px', fontSize: '0.82rem' }}
+                  onClick={() => setReportPeriod('all')}
+                >
+                  🌐 Semua Waktu
+                </button>
+                <button 
+                  className={`btn ${reportPeriod === 'custom' ? 'btn-primary' : 'btn-secondary'}`}
+                  style={{ padding: '7px 14px', fontSize: '0.82rem' }}
+                  onClick={() => setReportPeriod('custom')}
+                >
+                  📆 Pilih Tanggal
+                </button>
+
+                {/* Dropdown specific month */}
+                <select 
+                  className="overview-month-select"
+                  style={{ minWidth: '170px', padding: '6px 12px', fontSize: '0.82rem', height: '36px' }}
+                  value={reportPeriod.match(/^\d{4}-\d{2}$/) ? reportPeriod : ''}
+                  onChange={(e) => {
+                    if (e.target.value) setReportPeriod(e.target.value);
+                  }}
+                >
+                  <option value="" disabled>-- Pilih Bulan (Jan - Sep) --</option>
+                  {availableMonths.map(m => (
+                    <option key={m} value={m}>
+                      {formatMonthLabel(m)}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               {/* Print Button */}
               <button 
                 className="btn btn-primary"
                 onClick={() => window.print()}
-                style={{ padding: '10px 20px', gap: '8px' }}
+                style={{ padding: '9px 18px', gap: '8px', fontSize: '0.85rem' }}
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-                Cetak Laporan
+                🖨️ Cetak / Simpan PDF
               </button>
             </div>
 
             {/* Custom Date Pickers */}
             {reportPeriod === 'custom' && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px', backgroundColor: 'var(--bg-secondary)', padding: '16px', borderRadius: '12px', width: 'fit-content', border: '1px solid var(--border-color)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px', backgroundColor: 'var(--bg-secondary)', padding: '14px 18px', borderRadius: '12px', width: 'fit-content', border: '1px solid var(--border-color)' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                   <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Mulai Tanggal</label>
                   <input 
                     type="date" 
                     className="form-control" 
-                    style={{ maxWidth: '160px', padding: '6px 12px' }}
+                    style={{ maxWidth: '160px', padding: '6px 12px', minHeight: '36px' }}
                     value={customStartDate}
                     onChange={(e) => setCustomStartDate(e.target.value)}
                   />
@@ -2963,7 +3006,7 @@ export default function App() {
                   <input 
                     type="date" 
                     className="form-control" 
-                    style={{ maxWidth: '160px', padding: '6px 12px' }}
+                    style={{ maxWidth: '160px', padding: '6px 12px', minHeight: '36px' }}
                     value={customEndDate}
                     onChange={(e) => setCustomEndDate(e.target.value)}
                   />
@@ -2971,111 +3014,212 @@ export default function App() {
               </div>
             )}
 
-            {/* Performance Stats Cards */}
-            <div className="grid-stats">
+            {/* Active Period Notification Badge */}
+            <div className="overview-active-filter-badge" style={{ marginBottom: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <span>📑 Laporan Keuangan & Rekapitulasi:</span>
+                <strong style={{ color: 'var(--accent)' }}>{reportPeriodLabel}</strong>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                  ({filteredTransactions.length} transaksi masuk, {filteredExpenses.length} transaksi keluar)
+                </span>
+              </div>
+              {reportPeriod !== 'month' && (
+                <button 
+                  type="button" 
+                  className="btn-clear-filter"
+                  onClick={() => setReportPeriod('month')}
+                  title="Kembalikan ke Bulan Ini"
+                >
+                  ✕ Reset ke Bulan Ini
+                </button>
+              )}
+            </div>
+
+            {/* 4 Core Financial & Executive Stats Cards */}
+            <div className="grid-stats" style={{ marginBottom: '24px' }}>
+              {/* Card 1: Omzet Kotor */}
               <div className="card-stat">
                 <div className="stat-info">
-                  <p>Omzet Periode Ini</p>
+                  <p>Total Pemasukan (Omzet Kotor)</p>
                   <h3 style={{ color: 'var(--accent)' }}>{formatRupiah(periodRevenue)}</h3>
+                  <div className="stat-breakdown-tags">
+                    <span className="stat-tag success">Member: {formatRupiah(periodMembershipRev)}</span>
+                    <span className="stat-tag accent">Visit: {formatRupiah(periodDailyRev)}</span>
+                    <span className="stat-tag warning">Toko: {formatRupiah(periodStoreRev)}</span>
+                  </div>
                 </div>
                 <div className="stat-icon blue">
                   <svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 1.21-1.04 1.93-2.7 1.93-1.93 0-2.7-.93-2.82-2.1H5.1c.1 2.15 1.72 3.39 3.7 3.84V21h3v-2.15c2-.37 3.66-1.58 3.66-3.61 0-2.85-2.66-3.75-3.66-4.34z"/></svg>
                 </div>
               </div>
+
+              {/* Card 2: Pengeluaran (Beban Biaya) */}
               <div className="card-stat">
                 <div className="stat-info">
-                  <p>Volume Transaksi</p>
-                  <h3>{filteredTransactions.length} Transaksi</h3>
+                  <p>Total Pengeluaran (Beban Operasional)</p>
+                  <h3 style={{ color: 'var(--danger)' }}>-{formatRupiah(periodExpenses)}</h3>
+                  <div className="stat-breakdown-tags">
+                    <span className="stat-tag danger">{filteredExpenses.length} Pengeluaran</span>
+                    <span className="stat-tag">Cash: {formatRupiah(periodCashExpenses)}</span>
+                    <span className="stat-tag">Transfer: {formatRupiah(periodNonCashExpenses)}</span>
+                  </div>
+                </div>
+                <div className="stat-icon danger" style={{ backgroundColor: 'rgba(239, 68, 68, 0.15)', color: 'var(--danger)' }}>
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 14V6c0-1.1-.9-2-2-2H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zm-9-2c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm13-6v10c0 1.1-.9 2-2 2H4v-2h17V6h2z"/></svg>
+                </div>
+              </div>
+
+              {/* Card 3: Keuntungan Bersih (Omzet Bersih / Laba) */}
+              <div className="card-stat">
+                <div className="stat-info">
+                  <p>Keuntungan Bersih (Omzet Bersih)</p>
+                  <h3 style={{ color: periodNetProfit >= 0 ? 'var(--success)' : 'var(--danger)' }}>
+                    {formatRupiah(periodNetProfit)}
+                  </h3>
+                  <div className="stat-breakdown-tags">
+                    <span className={`stat-tag ${periodNetProfit >= 0 ? 'success' : 'danger'}`}>
+                      Margin Bersih: {profitMarginPercent}%
+                    </span>
+                    <span className="stat-tag">
+                      {periodNetProfit >= 0 ? 'Surplus / Profit ✅' : 'Defisit Operasional ⚠️'}
+                    </span>
+                  </div>
                 </div>
                 <div className="stat-icon green">
+                  <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                </div>
+              </div>
+
+              {/* Card 4: Arus Kas & Volume Bisnis */}
+              <div className="card-stat">
+                <div className="stat-info">
+                  <p>Arus Kas & Tamu Periode Ini</p>
+                  <h3>{filteredTransactions.length} <span style={{ fontSize: '1rem', fontWeight: 'normal', color: 'var(--text-secondary)' }}>transaksi</span></h3>
+                  <div className="stat-breakdown-tags">
+                    <span className="stat-tag success">Cash: {formatRupiah(periodCash)}</span>
+                    <span className="stat-tag accent">QRIS: {formatRupiah(periodQRIS)}</span>
+                    <span className="stat-tag warning">+{periodNewMembers} Mbr | {periodDailyCount} Visit</span>
+                  </div>
+                </div>
+                <div className="stat-icon blue">
                   <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
                 </div>
               </div>
-              <div className="card-stat">
-                <div className="stat-info">
-                  <p>Member Baru Terdaftar</p>
-                  <h3>+{periodNewMembers} Member</h3>
+            </div>
+
+            {/* Profit & Loss Calculation Statement Card */}
+            <div className="card-table-wrapper" style={{ padding: '20px 24px', marginBottom: '24px', background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.7) 100%)', border: '1px solid var(--border-color)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
+                <h3 style={{ fontSize: '1.05rem', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span>⚖️</span>
+                  <span>Neraca Perhitungan Laba Bersih ({reportPeriodLabel})</span>
+                </h3>
+                <span className="badge badge-active" style={{ fontSize: '0.8rem', padding: '4px 10px' }}>
+                  Efisiensi: {profitMarginPercent}% Laba Bersih
+                </span>
+              </div>
+
+              {/* 3 Step Equation Bar */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px', marginBottom: '16px' }}>
+                <div style={{ padding: '12px 16px', backgroundColor: 'rgba(0, 242, 254, 0.08)', borderRadius: '10px', border: '1px solid rgba(0, 242, 254, 0.2)' }}>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>📥 1. Total Pemasukan Kotor</div>
+                  <strong style={{ fontSize: '1.15rem', color: 'var(--accent)' }}>{formatRupiah(periodRevenue)}</strong>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>Member + Harian + Toko</div>
                 </div>
-                <div className="stat-icon blue">
-                  <svg viewBox="0 0 24 24"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+
+                <div style={{ padding: '12px 16px', backgroundColor: 'rgba(239, 68, 68, 0.08)', borderRadius: '10px', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>📤 2. Total Beban Pengeluaran</div>
+                  <strong style={{ fontSize: '1.15rem', color: 'var(--danger)' }}>-{formatRupiah(periodExpenses)}</strong>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>{expenseRatioPercent}% dari total omzet</div>
+                </div>
+
+                <div style={{ padding: '12px 16px', backgroundColor: 'rgba(16, 185, 129, 0.08)', borderRadius: '10px', border: '1px solid rgba(16, 185, 129, 0.25)' }}>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>💎 3. Omzet Bersih (Laba Bersih)</div>
+                  <strong style={{ fontSize: '1.25rem', color: periodNetProfit >= 0 ? 'var(--success)' : 'var(--danger)' }}>{formatRupiah(periodNetProfit)}</strong>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>Pemasukan dikurangi Pengeluaran</div>
                 </div>
               </div>
-              <div className="card-stat">
-                <div className="stat-info">
-                  <p>Tamu Harian Masuk</p>
-                  <h3>{periodDailyCount} Kunjungan</h3>
+
+              {/* Visual Proportion Bar */}
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                  <span>Proporsi Keuangan:</span>
+                  <span>
+                    <strong style={{ color: 'var(--success)' }}>Laba {profitMarginPercent}%</strong> | <strong style={{ color: 'var(--danger)' }}>Beban {expenseRatioPercent}%</strong>
+                  </span>
                 </div>
-                <div className="stat-icon warning">
-                  <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                <div style={{ backgroundColor: 'var(--bg-tertiary)', height: '12px', borderRadius: '6px', overflow: 'hidden', display: 'flex' }}>
+                  <div style={{ backgroundColor: 'var(--success)', height: '100%', width: `${Math.max(0, Math.min(100, profitMarginPercent))}%`, transition: 'width 0.4s ease' }} title={`Keuntungan Bersih: ${profitMarginPercent}%`}></div>
+                  <div style={{ backgroundColor: 'var(--danger)', height: '100%', width: `${Math.max(0, Math.min(100, expenseRatioPercent))}%`, transition: 'width 0.4s ease' }} title={`Pengeluaran: ${expenseRatioPercent}%`}></div>
                 </div>
               </div>
             </div>
 
             {/* Split breakdown and bestselling items */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px', marginBottom: '24px' }}>
               
-              {/* Left Column: Financial Breakdown */}
+              {/* Left Column: Financial Revenue Breakdown */}
               <div className="card-table-wrapper">
                 <div className="table-header">
-                  <h2>Sumber Pendapatan Periode Ini</h2>
+                  <h2>📊 Rincian Sumber Pemasukan</h2>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', marginTop: '16px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '16px' }}>
                   
                   {/* Membership */}
                   <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '0.9rem' }}>
-                      <span>Membership Anggota</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '0.88rem' }}>
+                      <span>🎫 Membership Anggota</span>
                       <strong>{formatRupiah(periodMembershipRev)} ({periodRevenue ? Math.round((periodMembershipRev/periodRevenue)*100) : 0}%)</strong>
                     </div>
-                    <div style={{ backgroundColor: 'var(--bg-tertiary)', height: '10px', borderRadius: '5px', overflow: 'hidden' }}>
+                    <div style={{ backgroundColor: 'var(--bg-tertiary)', height: '8px', borderRadius: '4px', overflow: 'hidden' }}>
                       <div style={{ backgroundColor: 'var(--success)', height: '100%', width: `${periodRevenue ? (periodMembershipRev/periodRevenue)*100 : 0}%` }}></div>
                     </div>
                   </div>
 
                   {/* Daily Pass */}
                   <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '0.9rem' }}>
-                      <span>Kunjungan Harian (Tamu)</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '0.88rem' }}>
+                      <span>🎟️ Kunjungan Harian (Tamu)</span>
                       <strong>{formatRupiah(periodDailyRev)} ({periodRevenue ? Math.round((periodDailyRev/periodRevenue)*100) : 0}%)</strong>
                     </div>
-                    <div style={{ backgroundColor: 'var(--bg-tertiary)', height: '10px', borderRadius: '5px', overflow: 'hidden' }}>
+                    <div style={{ backgroundColor: 'var(--bg-tertiary)', height: '8px', borderRadius: '4px', overflow: 'hidden' }}>
                       <div style={{ backgroundColor: 'var(--accent)', height: '100%', width: `${periodRevenue ? (periodDailyRev/periodRevenue)*100 : 0}%` }}></div>
                     </div>
                   </div>
 
                   {/* Toko */}
                   <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '0.9rem' }}>
-                      <span>Toko Gym</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '0.88rem' }}>
+                      <span>🥤 Toko & Suplemen Gym</span>
                       <strong>{formatRupiah(periodStoreRev)} ({periodRevenue ? Math.round((periodStoreRev/periodRevenue)*100) : 0}%)</strong>
                     </div>
-                    <div style={{ backgroundColor: 'var(--bg-tertiary)', height: '10px', borderRadius: '5px', overflow: 'hidden' }}>
+                    <div style={{ backgroundColor: 'var(--bg-tertiary)', height: '8px', borderRadius: '4px', overflow: 'hidden' }}>
                       <div style={{ backgroundColor: 'var(--warning)', height: '100%', width: `${periodRevenue ? (periodStoreRev/periodRevenue)*100 : 0}%` }}></div>
                     </div>
                   </div>
 
                   {/* Payment Method Breakdown */}
-                  <div style={{ borderTop: '1px solid var(--border-color)', margin: '8px 0 0 0', paddingTop: '20px' }}>
-                    <h3 style={{ fontSize: '0.95rem', fontWeight: '600', marginBottom: '16px', color: 'var(--text-secondary)' }}>Metode Pembayaran Periode Ini</h3>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <div style={{ borderTop: '1px solid var(--border-color)', margin: '4px 0 0 0', paddingTop: '16px' }}>
+                    <h3 style={{ fontSize: '0.9rem', fontWeight: '600', marginBottom: '14px', color: 'var(--text-secondary)' }}>Metode Penerimaan Uang</h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                       {/* Cash */}
                       <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '0.85rem' }}>
-                          <span>Cash / Tunai</span>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '0.84rem' }}>
+                          <span>💵 Tunai (Cash)</span>
                           <strong>{formatRupiah(periodCash)} ({periodRevenue ? Math.round((periodCash/periodRevenue)*100) : 0}%)</strong>
                         </div>
-                        <div style={{ backgroundColor: 'var(--bg-tertiary)', height: '8px', borderRadius: '4px', overflow: 'hidden' }}>
+                        <div style={{ backgroundColor: 'var(--bg-tertiary)', height: '7px', borderRadius: '4px', overflow: 'hidden' }}>
                           <div style={{ backgroundColor: 'var(--success)', height: '100%', width: `${periodRevenue ? (periodCash/periodRevenue)*100 : 0}%` }}></div>
                         </div>
                       </div>
 
                       {/* QRIS */}
                       <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '0.85rem' }}>
-                          <span>QRIS</span>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '0.84rem' }}>
+                          <span>📱 Non-Tunai (QRIS / ATM / Transfer)</span>
                           <strong>{formatRupiah(periodQRIS)} ({periodRevenue ? Math.round((periodQRIS/periodRevenue)*100) : 0}%)</strong>
                         </div>
-                        <div style={{ backgroundColor: 'var(--bg-tertiary)', height: '8px', borderRadius: '4px', overflow: 'hidden' }}>
+                        <div style={{ backgroundColor: 'var(--bg-tertiary)', height: '7px', borderRadius: '4px', overflow: 'hidden' }}>
                           <div style={{ backgroundColor: 'var(--accent)', height: '100%', width: `${periodRevenue ? (periodQRIS/periodRevenue)*100 : 0}%` }}></div>
                         </div>
                       </div>
@@ -3085,31 +3229,47 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Right Column: Best Selling Products */}
+              {/* Right Column: Best Selling Products & Expense Breakdown */}
               <div className="card-table-wrapper">
                 <div className="table-header">
-                  <h2>Produk Terlaris (Toko)</h2>
+                  <h2>💸 Rincian Pengeluaran & Produk Terlaris</h2>
                 </div>
-                <div className="table-container" style={{ marginTop: '8px' }}>
+                
+                {/* Expense Summary mini box */}
+                <div style={{ padding: '12px 16px', backgroundColor: 'rgba(239, 68, 68, 0.08)', borderRadius: '10px', border: '1px solid rgba(239, 68, 68, 0.2)', marginBottom: '16px', marginTop: '16px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                    <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Total Beban Operasional:</span>
+                    <strong style={{ color: 'var(--danger)', fontSize: '1rem' }}>-{formatRupiah(periodExpenses)}</strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                    <span>💵 Tunai: {formatRupiah(periodCashExpenses)}</span>
+                    <span>💳 Transfer/QRIS: {formatRupiah(periodNonCashExpenses)}</span>
+                  </div>
+                </div>
+
+                <h4 style={{ fontSize: '0.88rem', fontWeight: '600', color: 'var(--text-secondary)', marginBottom: '8px' }}>
+                  🏆 Produk Toko Terlaris:
+                </h4>
+                <div className="table-container">
                   <table>
                     <thead>
                       <tr>
                         <th>Nama Produk</th>
-                        <th>Kuantitas Terjual</th>
+                        <th style={{ textAlign: 'center' }}>Terjual</th>
                       </tr>
                     </thead>
                     <tbody>
                       {bestSellers.length === 0 ? (
                         <tr>
-                          <td colSpan="2" style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>
+                          <td colSpan="2" style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '16px' }}>
                             Tidak ada penjualan produk pada periode ini.
                           </td>
                         </tr>
                       ) : (
-                        bestSellers.map((item, index) => (
+                        bestSellers.slice(0, 5).map((item, index) => (
                           <tr key={index}>
                             <td><strong>{item.name}</strong></td>
-                            <td><span className="badge badge-active">{item.qty} pcs</span></td>
+                            <td style={{ textAlign: 'center' }}><span className="badge badge-active">{item.qty} pcs</span></td>
                           </tr>
                         ))
                       )}
@@ -3123,7 +3283,7 @@ export default function App() {
             {/* Periodic Transactions Table */}
             <div className="card-table-wrapper" style={{ marginTop: '24px' }}>
               <div className="table-header">
-                <h2>Rincian Transaksi Periode Ini</h2>
+                <h2>📥 Rincian Seluruh Transaksi Pemasukan ({filteredTransactions.length})</h2>
               </div>
               <div className="table-container">
                 <table>
@@ -3141,24 +3301,24 @@ export default function App() {
                   <tbody>
                     {filteredTransactions.length === 0 ? (
                       <tr>
-                        <td colSpan="7" style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>
+                        <td colSpan="7" style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '24px' }}>
                           Tidak ada transaksi yang tercatat dalam periode ini.
                         </td>
                       </tr>
                     ) : (
-                      filteredTransactions.map(t => (
+                      filteredTransactions.slice(0, 100).map(t => (
                         <tr key={t.id}>
                           <td><code>{t.id}</code></td>
                           <td><strong>{t.memberName}</strong></td>
                           <td>
-                            <span className={`badge ${t.type === 'Membership' ? 'badge-active' : t.type === 'Kunjungan Harian' ? 'badge-pending' : 'badge-expired'}`}>
-                              {t.type}
+                            <span className={`badge ${t.type === 'Membership' || t.type === 'member' || t.type === 'renewal' ? 'badge-active' : t.type === 'Kunjungan Harian' || t.type === 'daily' ? 'badge-pending' : 'badge-expired'}`}>
+                              {t.type === 'member' || t.type === 'renewal' ? 'Membership' : t.type === 'daily' ? 'Kunjungan Harian' : t.type === 'product' ? 'Toko' : t.type}
                             </span>
                           </td>
                           <td>{t.desc}</td>
                           <td>{t.date}</td>
                           <td>
-                            <span className={`badge ${t.paymentMethod === 'QRIS' ? 'badge-active' : 'badge-pending'}`} style={{ fontSize: '0.75rem' }}>
+                            <span className={`badge ${t.paymentMethod === 'QRIS' || t.paymentMethod === 'ATM' ? 'badge-active' : 'badge-pending'}`} style={{ fontSize: '0.75rem' }}>
                               {t.paymentMethod || 'Cash'}
                             </span>
                           </td>
@@ -3169,12 +3329,17 @@ export default function App() {
                   </tbody>
                 </table>
               </div>
+              {filteredTransactions.length > 100 && (
+                <div style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.85rem', borderTop: '1px solid var(--border-color)' }}>
+                  Menampilkan 100 transaksi teratas dari total {filteredTransactions.length} transaksi. Gunakan Cetak PDF untuk rekapitulasi lengkap.
+                </div>
+              )}
             </div>
 
             {/* Periodic Expenses Table */}
             <div className="card-table-wrapper" style={{ marginTop: '24px' }}>
               <div className="table-header">
-                <h2>Rincian Pengeluaran Periode Ini</h2>
+                <h2>📤 Rincian Seluruh Pengeluaran Biaya ({filteredExpenses.length})</h2>
               </div>
               <div className="table-container">
                 <table>
@@ -3190,7 +3355,7 @@ export default function App() {
                   <tbody>
                     {filteredExpenses.length === 0 ? (
                       <tr>
-                        <td colSpan="5" style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>
+                        <td colSpan="5" style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '24px' }}>
                           Tidak ada pengeluaran yang tercatat dalam periode ini.
                         </td>
                       </tr>
@@ -3201,7 +3366,7 @@ export default function App() {
                           <td><strong>{exp.desc}</strong></td>
                           <td>{exp.date}</td>
                           <td>
-                            <span className={`badge ${exp.paymentMethod === 'QRIS' ? 'badge-active' : 'badge-pending'}`} style={{ fontSize: '0.75rem' }}>
+                            <span className={`badge ${exp.paymentMethod === 'QRIS' || exp.paymentMethod === 'Transfer' ? 'badge-active' : 'badge-pending'}`} style={{ fontSize: '0.75rem' }}>
                               {exp.paymentMethod || 'Cash'}
                             </span>
                           </td>
