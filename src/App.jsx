@@ -293,12 +293,27 @@ export default function App() {
   const [customEndDate, setCustomEndDate] = useState(() => {
     return new Date().toISOString().split('T')[0];
   });
+
+  // Overview Tab Filter State (All Time, specific month YYYY-MM, or custom range)
+  const [overviewFilter, setOverviewFilter] = useState('all'); // 'all', '2026-09', '2026-08', etc. or 'custom'
+  const [overviewCustomStart, setOverviewCustomStart] = useState(() => {
+    const today = new Date();
+    return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-01`;
+  });
+  const [overviewCustomEnd, setOverviewCustomEnd] = useState(() => {
+    const today = new Date();
+    const y = today.getFullYear();
+    const m = String(today.getMonth() + 1).padStart(2, '0');
+    const d = String(today.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  });
+
   const [hoveredPoint, setHoveredPoint] = useState(null);
   const [storePaymentMethod, setStorePaymentMethod] = useState('Cash');
   
   useEffect(() => {
     setHoveredPoint(null);
-  }, [chartPeriod]);
+  }, [chartPeriod, overviewFilter]);
 
   // Modals States
   const [isMemberModalOpen, setIsMemberModalOpen] = useState(false);
@@ -424,7 +439,83 @@ export default function App() {
     return true;
   };
 
-  // Calculations for Stats (Global overview)
+  // Normalized Type Helpers (supports both database types 'member'/'renewal'/'daily'/'product' and frontend types)
+  const isMembershipTx = (t) => t.type === 'Membership' || t.type === 'member' || t.type === 'renewal';
+  const isDailyTx = (t) => t.type === 'Kunjungan Harian' || t.type === 'daily';
+  const isStoreTx = (t) => t.type === 'Toko' || t.type === 'product';
+
+  // Available Months for Overview & Reports (extracted from transactions)
+  const availableMonths = React.useMemo(() => {
+    const set = new Set();
+    transactions.forEach(t => {
+      if (t.date && t.date.length >= 7) {
+        set.add(t.date.substring(0, 7));
+      }
+    });
+    const currentM = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
+    set.add(currentM);
+    return Array.from(set).sort().reverse();
+  }, [transactions]);
+
+  const currentMonthStr = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
+
+  const formatMonthLabel = (mStr) => {
+    if (!mStr || mStr === 'all') return 'Semua Waktu';
+    if (mStr === 'custom') return `${overviewCustomStart} s/d ${overviewCustomEnd}`;
+    const parts = mStr.split('-');
+    if (parts.length < 2) return mStr;
+    const y = parseInt(parts[0]);
+    const m = parseInt(parts[1]);
+    const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    return `${monthNames[m - 1] || mStr} ${y}`;
+  };
+
+  const overviewFilterLabel = formatMonthLabel(overviewFilter);
+
+  // Overview Filter Check Helper
+  const isDateInOverviewFilter = (dateStr) => {
+    if (!dateStr) return false;
+    if (overviewFilter === 'all') return true;
+    if (overviewFilter === 'custom') {
+      return dateStr >= overviewCustomStart && dateStr <= overviewCustomEnd;
+    }
+    return dateStr.startsWith(overviewFilter);
+  };
+
+  // Filtered Overview Data Sets
+  const overviewTransactions = React.useMemo(() => {
+    if (overviewFilter === 'all') return transactions;
+    return transactions.filter(t => isDateInOverviewFilter(t.date));
+  }, [transactions, overviewFilter, overviewCustomStart, overviewCustomEnd]);
+
+  const overviewExpenses = React.useMemo(() => {
+    if (overviewFilter === 'all') return expenses;
+    return expenses.filter(e => isDateInOverviewFilter(e.date));
+  }, [expenses, overviewFilter, overviewCustomStart, overviewCustomEnd]);
+
+  const overviewVisitors = React.useMemo(() => {
+    if (overviewFilter === 'all') return dailyVisitors;
+    return dailyVisitors.filter(v => isDateInOverviewFilter(v.date));
+  }, [dailyVisitors, overviewFilter, overviewCustomStart, overviewCustomEnd]);
+
+  const overviewNewMembersCount = React.useMemo(() => {
+    if (overviewFilter === 'all') return members.length;
+    return members.filter(m => isDateInOverviewFilter(m.startDate)).length;
+  }, [members, overviewFilter, overviewCustomStart, overviewCustomEnd]);
+
+  // Overview Metrics
+  const overviewTotalRev = overviewTransactions.reduce((acc, curr) => acc + (curr.amount || 0), 0);
+  const overviewMembershipRev = overviewTransactions.filter(isMembershipTx).reduce((acc, curr) => acc + (curr.amount || 0), 0);
+  const overviewDailyRev = overviewTransactions.filter(isDailyTx).reduce((acc, curr) => acc + (curr.amount || 0), 0);
+  const overviewStoreRev = overviewTransactions.filter(isStoreTx).reduce((acc, curr) => acc + (curr.amount || 0), 0);
+
+  const overviewTotalExpenses = overviewExpenses.reduce((acc, curr) => acc + (curr.amount || 0), 0);
+  const overviewNetProfit = overviewTotalRev - overviewTotalExpenses;
+
+  const overviewCash = overviewTransactions.filter(t => t.paymentMethod?.toLowerCase() === 'cash' || !t.paymentMethod).reduce((acc, curr) => acc + (curr.amount || 0), 0);
+  const overviewQRIS = overviewTransactions.filter(t => t.paymentMethod?.toLowerCase() === 'qris' || t.paymentMethod === 'ATM').reduce((acc, curr) => acc + (curr.amount || 0), 0);
+
+  // Calculations for Stats (Global overview fallback)
   const activeMembersCount = members.filter(m => getStatus(m.endDate) === 'Active').length;
   
   const expiringMembers = members.filter(m => {
@@ -432,18 +523,18 @@ export default function App() {
     return days >= 0 && days <= 30;
   });
 
-  const membershipRev = transactions.filter(t => t.type === 'Membership').reduce((acc, curr) => acc + curr.amount, 0);
-  const dailyRev = transactions.filter(t => t.type === 'Kunjungan Harian').reduce((acc, curr) => acc + curr.amount, 0);
-  const storeRev = transactions.filter(t => t.type === 'Toko').reduce((acc, curr) => acc + curr.amount, 0);
+  const membershipRev = transactions.filter(isMembershipTx).reduce((acc, curr) => acc + curr.amount, 0);
+  const dailyRev = transactions.filter(isDailyTx).reduce((acc, curr) => acc + curr.amount, 0);
+  const storeRev = transactions.filter(isStoreTx).reduce((acc, curr) => acc + curr.amount, 0);
   const totalRevenue = transactions.reduce((acc, curr) => acc + curr.amount, 0);
 
   // Period-based stats calculations (For Reports Tab)
   const filteredTransactions = transactions.filter(t => isInPeriod(t.date, reportPeriod));
   const periodRevenue = filteredTransactions.reduce((acc, curr) => acc + curr.amount, 0);
   
-  const periodMembershipRev = filteredTransactions.filter(t => t.type === 'Membership').reduce((acc, curr) => acc + curr.amount, 0);
-  const periodDailyRev = filteredTransactions.filter(t => t.type === 'Kunjungan Harian').reduce((acc, curr) => acc + curr.amount, 0);
-  const periodStoreRev = filteredTransactions.filter(t => t.type === 'Toko').reduce((acc, curr) => acc + curr.amount, 0);
+  const periodMembershipRev = filteredTransactions.filter(isMembershipTx).reduce((acc, curr) => acc + curr.amount, 0);
+  const periodDailyRev = filteredTransactions.filter(isDailyTx).reduce((acc, curr) => acc + curr.amount, 0);
+  const periodStoreRev = filteredTransactions.filter(isStoreTx).reduce((acc, curr) => acc + curr.amount, 0);
 
   const periodNewMembers = members.filter(m => isInPeriod(m.startDate, reportPeriod)).length;
   const periodDailyCount = dailyVisitors.filter(d => isInPeriod(d.date, reportPeriod)).length;
@@ -451,9 +542,9 @@ export default function App() {
   // Best selling products extractor for selected period
   const getBestSellingProducts = () => {
     const sales = {};
-    filteredTransactions.filter(t => t.type === 'Toko').forEach(t => {
+    filteredTransactions.filter(isStoreTx).forEach(t => {
       // Parse desc e.g. "Air Mineral 600ml (x3), Whey Protein Shake (x1)"
-      const items = t.desc.split(', ');
+      const items = (t.desc || '').split(', ');
       items.forEach(item => {
         const match = item.match(/(.+)\s\(x(\d+)\)/);
         if (match) {
@@ -470,11 +561,11 @@ export default function App() {
 
   const bestSellers = getBestSellingProducts();
 
-  const totalCash = transactions.filter(t => t.paymentMethod === 'Cash' || !t.paymentMethod).reduce((acc, curr) => acc + curr.amount, 0);
-  const totalQRIS = transactions.filter(t => t.paymentMethod === 'QRIS').reduce((acc, curr) => acc + curr.amount, 0);
+  const totalCash = transactions.filter(t => t.paymentMethod?.toLowerCase() === 'cash' || !t.paymentMethod).reduce((acc, curr) => acc + curr.amount, 0);
+  const totalQRIS = transactions.filter(t => t.paymentMethod?.toLowerCase() === 'qris' || t.paymentMethod === 'ATM').reduce((acc, curr) => acc + curr.amount, 0);
 
-  const periodCash = filteredTransactions.filter(t => t.paymentMethod === 'Cash' || !t.paymentMethod).reduce((acc, curr) => acc + curr.amount, 0);
-  const periodQRIS = filteredTransactions.filter(t => t.paymentMethod === 'QRIS').reduce((acc, curr) => acc + curr.amount, 0);
+  const periodCash = filteredTransactions.filter(t => t.paymentMethod?.toLowerCase() === 'cash' || !t.paymentMethod).reduce((acc, curr) => acc + curr.amount, 0);
+  const periodQRIS = filteredTransactions.filter(t => t.paymentMethod?.toLowerCase() === 'qris' || t.paymentMethod === 'ATM').reduce((acc, curr) => acc + curr.amount, 0);
 
   const totalExpenses = expenses.reduce((acc, curr) => acc + curr.amount, 0);
   const netProfit = totalRevenue - totalExpenses;
@@ -1177,9 +1268,9 @@ export default function App() {
         details.push({
           dateStr,
           count: matched.length,
-          membership: matched.filter(t => t.type === 'Membership').reduce((acc, curr) => acc + (curr.amount || 0), 0),
-          daily: matched.filter(t => t.type === 'Kunjungan Harian').reduce((acc, curr) => acc + (curr.amount || 0), 0),
-          store: matched.filter(t => t.type === 'Toko').reduce((acc, curr) => acc + (curr.amount || 0), 0)
+          membership: matched.filter(isMembershipTx).reduce((acc, curr) => acc + (curr.amount || 0), 0),
+          daily: matched.filter(isDailyTx).reduce((acc, curr) => acc + (curr.amount || 0), 0),
+          store: matched.filter(isStoreTx).reduce((acc, curr) => acc + (curr.amount || 0), 0)
         });
       }
     } else if (chartPeriod === 'weekly') {
@@ -1200,29 +1291,35 @@ export default function App() {
         details.push({
           dateStr: `${startStr} s/d ${endStr}`,
           count: matched.length,
-          membership: matched.filter(t => t.type === 'Membership').reduce((acc, curr) => acc + (curr.amount || 0), 0),
-          daily: matched.filter(t => t.type === 'Kunjungan Harian').reduce((acc, curr) => acc + (curr.amount || 0), 0),
-          store: matched.filter(t => t.type === 'Toko').reduce((acc, curr) => acc + (curr.amount || 0), 0)
+          membership: matched.filter(isMembershipTx).reduce((acc, curr) => acc + (curr.amount || 0), 0),
+          daily: matched.filter(isDailyTx).reduce((acc, curr) => acc + (curr.amount || 0), 0),
+          store: matched.filter(isStoreTx).reduce((acc, curr) => acc + (curr.amount || 0), 0)
         });
       }
     } else if (chartPeriod === 'monthly') {
-      // Bulan Ini (Hari ke-1 s/d hari terakhir bulan ini)
-      const currentYear = today.getFullYear();
-      const currentMonth = today.getMonth();
-      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+      // If overviewFilter is set to a specific month (e.g. '2026-08'), use that month; otherwise use current month
+      let targetYear = today.getFullYear();
+      let targetMonth = today.getMonth();
+      if (overviewFilter && (overviewFilter.startsWith('2026-') || overviewFilter.match(/^\d{4}-\d{2}$/))) {
+        const parts = overviewFilter.split('-').map(Number);
+        targetYear = parts[0];
+        targetMonth = parts[1] - 1;
+      }
+      
+      const daysInMonth = new Date(targetYear, targetMonth + 1, 0).getDate();
       
       for (let i = 1; i <= daysInMonth; i++) {
         labels.push(`${i}`);
-        const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+        const dateStr = `${targetYear}-${String(targetMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
         const matched = transactions.filter(t => t.date === dateStr);
         const sum = matched.reduce((acc, curr) => acc + (curr.amount || 0), 0);
         values.push(sum);
         details.push({
           dateStr,
           count: matched.length,
-          membership: matched.filter(t => t.type === 'Membership').reduce((acc, curr) => acc + (curr.amount || 0), 0),
-          daily: matched.filter(t => t.type === 'Kunjungan Harian').reduce((acc, curr) => acc + (curr.amount || 0), 0),
-          store: matched.filter(t => t.type === 'Toko').reduce((acc, curr) => acc + (curr.amount || 0), 0)
+          membership: matched.filter(isMembershipTx).reduce((acc, curr) => acc + (curr.amount || 0), 0),
+          daily: matched.filter(isDailyTx).reduce((acc, curr) => acc + (curr.amount || 0), 0),
+          store: matched.filter(isStoreTx).reduce((acc, curr) => acc + (curr.amount || 0), 0)
         });
       }
     } else {
@@ -1244,9 +1341,9 @@ export default function App() {
       details = matchedByMonth.map((matched, idx) => ({
         dateStr: `${labels[idx]} ${currentYear}`,
         count: matched.length,
-        membership: matched.filter(t => t.type === 'Membership').reduce((acc, curr) => acc + (curr.amount || 0), 0),
-        daily: matched.filter(t => t.type === 'Kunjungan Harian').reduce((acc, curr) => acc + (curr.amount || 0), 0),
-        store: matched.filter(t => t.type === 'Toko').reduce((acc, curr) => acc + (curr.amount || 0), 0)
+        membership: matched.filter(isMembershipTx).reduce((acc, curr) => acc + (curr.amount || 0), 0),
+        daily: matched.filter(isDailyTx).reduce((acc, curr) => acc + (curr.amount || 0), 0),
+        store: matched.filter(isStoreTx).reduce((acc, curr) => acc + (curr.amount || 0), 0)
       }));
     }
 
@@ -1555,39 +1652,187 @@ export default function App() {
         {/* OVERVIEW TAB */}
         {activeTab === 'overview' && (
           <div>
+            {/* Overview Date & Month Filter Controls */}
+            <div className="overview-filter-bar">
+              <div className="overview-filter-left">
+                <span className="overview-filter-title">
+                  <span>📅</span>
+                  <span>Filter Periode:</span>
+                </span>
+                
+                <div className="overview-filter-pills">
+                  <button 
+                    type="button"
+                    className={`overview-pill ${overviewFilter === 'all' ? 'active' : ''}`}
+                    onClick={() => setOverviewFilter('all')}
+                  >
+                    Semua Waktu
+                  </button>
+                  <button 
+                    type="button"
+                    className={`overview-pill ${overviewFilter === currentMonthStr ? 'active' : ''}`}
+                    onClick={() => setOverviewFilter(currentMonthStr)}
+                  >
+                    Bulan Ini ({formatMonthLabel(currentMonthStr)})
+                  </button>
+                  {availableMonths.find(m => m !== currentMonthStr) && (
+                    <button 
+                      type="button"
+                      className={`overview-pill ${overviewFilter === availableMonths.find(m => m !== currentMonthStr) ? 'active' : ''}`}
+                      onClick={() => setOverviewFilter(availableMonths.find(m => m !== currentMonthStr))}
+                    >
+                      Bulan Lalu ({formatMonthLabel(availableMonths.find(m => m !== currentMonthStr))})
+                    </button>
+                  )}
+                  <button 
+                    type="button"
+                    className={`overview-pill ${overviewFilter === 'custom' ? 'active' : ''}`}
+                    onClick={() => setOverviewFilter('custom')}
+                  >
+                    📆 Kustom Tanggal
+                  </button>
+                </div>
+              </div>
+
+              <div className="overview-dropdown-wrapper">
+                <label className="overview-dropdown-label">Pilih Bulan:</label>
+                <select 
+                  className="overview-month-select"
+                  value={overviewFilter.startsWith('202') ? overviewFilter : ''}
+                  onChange={(e) => {
+                    if (e.target.value) setOverviewFilter(e.target.value);
+                  }}
+                >
+                  <option value="" disabled>-- Pilih Bulan Spesifik --</option>
+                  {availableMonths.map(m => (
+                    <option key={m} value={m}>
+                      {formatMonthLabel(m)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Custom Date Inputs if 'custom' is selected */}
+            {overviewFilter === 'custom' && (
+              <div className="overview-custom-dates-bar">
+                <span style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--accent)' }}>Rentang Tanggal:</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <input 
+                    type="date" 
+                    className="form-control" 
+                    style={{ minHeight: '36px', padding: '4px 10px', fontSize: '0.85rem', width: 'auto' }}
+                    value={overviewCustomStart}
+                    onChange={(e) => setOverviewCustomStart(e.target.value)}
+                  />
+                  <span style={{ color: 'var(--text-muted)' }}>s/d</span>
+                  <input 
+                    type="date" 
+                    className="form-control" 
+                    style={{ minHeight: '36px', padding: '4px 10px', fontSize: '0.85rem', width: 'auto' }}
+                    value={overviewCustomEnd}
+                    onChange={(e) => setOverviewCustomEnd(e.target.value)}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Active Filter Notification Banner */}
+            {overviewFilter !== 'all' && (
+              <div className="overview-active-filter-badge">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span>🔍 Menampilkan data periode:</span>
+                  <strong style={{ color: 'var(--accent)' }}>{overviewFilterLabel}</strong>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                    ({overviewTransactions.length} transaksi pemasukan, {overviewExpenses.length} pengeluaran)
+                  </span>
+                </div>
+                <button 
+                  type="button" 
+                  className="btn-clear-filter"
+                  onClick={() => setOverviewFilter('all')}
+                  title="Kembalikan ke Semua Waktu"
+                >
+                  ✕ Reset Filter (Semua Waktu)
+                </button>
+              </div>
+            )}
+
             {/* Upper stats row */}
             <div className="grid-stats">
               <div className="card-stat">
                 <div className="stat-info">
-                  <p>Member Hadir Hari Ini</p>
-                  <h3 style={{ color: 'var(--accent)' }}>{todayAttendanceList.length} <span style={{ fontSize: '1rem', fontWeight: 'normal', color: 'var(--text-secondary)' }}>orang</span></h3>
+                  <p>{overviewFilter === 'all' ? 'Member Hadir Hari Ini' : `Kunjungan Tamu (${overviewFilterLabel})`}</p>
+                  <h3 style={{ color: 'var(--accent)' }}>
+                    {overviewFilter === 'all' ? todayAttendanceList.length : overviewVisitors.length}{' '}
+                    <span style={{ fontSize: '1rem', fontWeight: 'normal', color: 'var(--text-secondary)' }}>orang</span>
+                  </h3>
+                  <div className="stat-breakdown-tags">
+                    {overviewFilter === 'all' ? (
+                      <span className="stat-tag">Tamu Hari Ini: {dailyVisitors.filter(d => d.date === new Date().toISOString().split('T')[0]).length} org</span>
+                    ) : (
+                      <>
+                        <span className="stat-tag accent">Pervisit: {formatRupiah(overviewDailyRev)}</span>
+                        <span className="stat-tag">Rata2: {overviewVisitors.length > 0 ? formatRupiah(Math.round(overviewDailyRev / overviewVisitors.length)) : 'Rp 0'}/org</span>
+                      </>
+                    )}
+                  </div>
                 </div>
                 <div className="stat-icon blue">
                   <svg viewBox="0 0 24 24"><path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/></svg>
                 </div>
               </div>
+
               <div className="card-stat">
                 <div className="stat-info">
-                  <p>Total Member Aktif</p>
-                  <h3>{activeMembersCount}</h3>
+                  <p>{overviewFilter === 'all' ? 'Total Member Aktif' : `Member Baru (${overviewFilterLabel})`}</p>
+                  <h3>
+                    {overviewFilter === 'all' ? activeMembersCount : overviewNewMembersCount}{' '}
+                    {overviewFilter !== 'all' && <span style={{ fontSize: '1rem', fontWeight: 'normal', color: 'var(--text-secondary)' }}>orang</span>}
+                  </h3>
+                  <div className="stat-breakdown-tags">
+                    {overviewFilter === 'all' ? (
+                      <>
+                        <span className="stat-tag success">Total: {members.length} member</span>
+                        <span className="stat-tag warning">Akan Habis: {expiringMembers.length}</span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="stat-tag success">Aktif Sekarang: {activeMembersCount}</span>
+                        <span className="stat-tag accent">Omset Member: {formatRupiah(overviewMembershipRev)}</span>
+                      </>
+                    )}
+                  </div>
                 </div>
                 <div className="stat-icon green">
                   <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
                 </div>
               </div>
+
               <div className="card-stat">
                 <div className="stat-info">
                   <p>Total Pemasukan (Omzet)</p>
-                  <h3 style={{ color: 'var(--accent)' }}>{formatRupiah(totalRevenue)}</h3>
+                  <h3 style={{ color: 'var(--accent)' }}>{formatRupiah(overviewTotalRev)}</h3>
+                  <div className="stat-breakdown-tags">
+                    <span className="stat-tag success">Member: {formatRupiah(overviewMembershipRev)}</span>
+                    <span className="stat-tag accent">Visit: {formatRupiah(overviewDailyRev)}</span>
+                    <span className="stat-tag warning">Toko: {formatRupiah(overviewStoreRev)}</span>
+                  </div>
                 </div>
                 <div className="stat-icon blue">
                   <svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 1.21-1.04 1.93-2.7 1.93-1.93 0-2.7-.93-2.82-2.1H5.1c.1 2.15 1.72 3.39 3.7 3.84V21h3v-2.15c2-.37 3.66-1.58 3.66-3.61 0-2.85-2.66-3.75-3.66-4.34z"/></svg>
                 </div>
               </div>
+
               <div className="card-stat">
                 <div className="stat-info">
                   <p>Keuntungan Bersih</p>
-                  <h3 style={{ color: netProfit >= 0 ? 'var(--success)' : 'var(--danger)' }}>{formatRupiah(netProfit)}</h3>
+                  <h3 style={{ color: overviewNetProfit >= 0 ? 'var(--success)' : 'var(--danger)' }}>{formatRupiah(overviewNetProfit)}</h3>
+                  <div className="stat-breakdown-tags">
+                    <span className="stat-tag" style={{ color: '#f87171' }}>Beban: {formatRupiah(overviewTotalExpenses)}</span>
+                    <span className="stat-tag">Cash: {formatRupiah(overviewCash)}</span>
+                    <span className="stat-tag">QRIS: {formatRupiah(overviewQRIS)}</span>
+                  </div>
                 </div>
                 <div className="stat-icon green">
                   <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
@@ -1665,7 +1910,7 @@ export default function App() {
                   <span>
                     {chartPeriod === 'daily' && 'Tren Pendapatan Harian (7 Hari Terakhir)'}
                     {chartPeriod === 'weekly' && 'Tren Pendapatan Mingguan (4 Minggu Terakhir)'}
-                    {chartPeriod === 'monthly' && `Tren Pendapatan Bulanan (Bulan Ini)`}
+                    {chartPeriod === 'monthly' && `Tren Pendapatan Bulanan (${overviewFilter !== 'all' ? overviewFilterLabel : 'Bulan Ini'})`}
                     {chartPeriod === 'yearly' && `Tren Pendapatan Tahunan (${new Date().getFullYear()})`}
                   </span>
                 </h3>
