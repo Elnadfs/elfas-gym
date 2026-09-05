@@ -13,10 +13,28 @@ const defaultPackages = [
 const defaultMembers = extractedMembers;
 
 const defaultProducts = [
-  { id: 'prod-1', name: 'Air Mineral 600ml', price: 5000, stock: 48 },
-  { id: 'prod-2', name: 'Whey Protein Shake', price: 35000, stock: 20 },
-  { id: 'prod-3', name: 'Energy Bar Muesli', price: 15000, stock: 15 },
-  { id: 'prod-4', name: 'Gym T-Shirt Fit', price: 120000, stock: 8 }
+  { id: 'prod-01', name: 'Mineral water 1.5 L', price: 6000, stock: 50 },
+  { id: 'prod-02', name: 'Mineral Water 600 ml', price: 3000, stock: 50 },
+  { id: 'prod-03', name: 'Master Whey Sachet', price: 15000, stock: 50 },
+  { id: 'prod-04', name: 'Evowhey sachet', price: 17000, stock: 50 },
+  { id: 'prod-05', name: 'Evogreen sachet', price: 16000, stock: 50 },
+  { id: 'prod-06', name: 'M PRO whey sachet', price: 32500, stock: 50 },
+  { id: 'prod-07', name: 'PREVO Sachet', price: 11000, stock: 50 },
+  { id: 'prod-08', name: 'M PRO CREATINE sachet', price: 13000, stock: 50 },
+  { id: 'prod-09', name: 'FITBAR', price: 7000, stock: 50 },
+  { id: 'prod-10', name: 'EVO BCAA sachet', price: 13000, stock: 50 },
+  { id: 'prod-11', name: 'Oxyburn Capsul', price: 5000, stock: 50 },
+  { id: 'prod-12', name: 'Flimty Sachet', price: 20000, stock: 50 },
+  { id: 'prod-13', name: 'Flimty Box', price: 280000, stock: 20 },
+  { id: 'prod-14', name: 'ION', price: 8000, stock: 50 },
+  { id: 'prod-15', name: 'Pocari', price: 8000, stock: 50 },
+  { id: 'prod-16', name: 'Vectorbar', price: 11000, stock: 50 },
+  { id: 'prod-17', name: 'TEH kotak kecil', price: 3000, stock: 50 },
+  { id: 'prod-18', name: 'TEH kotak besar', price: 5000, stock: 50 },
+  { id: 'prod-19', name: 'Teh sosro', price: 5000, stock: 50 },
+  { id: 'prod-20', name: 'PRO CREATINE BOX', price: 45000, stock: 30 },
+  { id: 'prod-21', name: 'HONEY', price: 8000, stock: 50 },
+  { id: 'prod-22', name: 'Fruit tea', price: 5000, stock: 50 }
 ];
 
 const defaultDailyVisitors = [];
