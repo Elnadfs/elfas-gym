@@ -1,0 +1,2081 @@
+[
+  {
+    "id": "EXP-20260105-01",
+    "date": "2026-01-05",
+    "desc": "GALON",
+    "amount": 30000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260105-02",
+    "date": "2026-01-05",
+    "desc": "HANDSANITIZER",
+    "amount": 90000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260105-03",
+    "date": "2026-01-05",
+    "desc": "ISOLASI",
+    "amount": 6500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260107-01",
+    "date": "2026-01-07",
+    "desc": "GALON",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260107-02",
+    "date": "2026-01-07",
+    "desc": "LEM KERTAS + KARTON",
+    "amount": 16000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260108-01",
+    "date": "2026-01-08",
+    "desc": "KIT",
+    "amount": 33000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260108-02",
+    "date": "2026-01-08",
+    "desc": "GALON",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260109-01",
+    "date": "2026-01-09",
+    "desc": "GALON",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260109-02",
+    "date": "2026-01-09",
+    "desc": "LEM ALTEKO",
+    "amount": 7000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260110-01",
+    "date": "2026-01-10",
+    "desc": "BAYAR ION&soyjoy",
+    "amount": 50500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260110-02",
+    "date": "2026-01-10",
+    "desc": "ONGKIR BAPAK",
+    "amount": 109000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260112-01",
+    "date": "2026-01-12",
+    "desc": "GALON",
+    "amount": 30000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260112-02",
+    "date": "2026-01-12",
+    "desc": "BAYAR PISANG",
+    "amount": 70000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260113-01",
+    "date": "2026-01-13",
+    "desc": "HANDZANITISER",
+    "amount": 39000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260113-02",
+    "date": "2026-01-13",
+    "desc": "SABUN",
+    "amount": 26000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260114-01",
+    "date": "2026-01-14",
+    "desc": "GALON",
+    "amount": 15000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260115-01",
+    "date": "2026-01-15",
+    "desc": "GALON",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260117-01",
+    "date": "2026-01-17",
+    "desc": "GALON",
+    "amount": 25000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260119-01",
+    "date": "2026-01-19",
+    "desc": "GALON",
+    "amount": 15000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260119-02",
+    "date": "2026-01-19",
+    "desc": "BAYAR PISANG",
+    "amount": 70000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260121-01",
+    "date": "2026-01-21",
+    "desc": "GALON",
+    "amount": 30000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260124-01",
+    "date": "2026-01-24",
+    "desc": "GALON",
+    "amount": 30000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260125-01",
+    "date": "2026-01-25",
+    "desc": "BAUT",
+    "amount": 5000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260126-01",
+    "date": "2026-01-26",
+    "desc": "GALON",
+    "amount": 25000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260128-01",
+    "date": "2026-01-28",
+    "desc": "GALON",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260128-02",
+    "date": "2026-01-28",
+    "desc": "KIT",
+    "amount": 33000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260128-03",
+    "date": "2026-01-28",
+    "desc": "HANDSANITIZER",
+    "amount": 90000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260130-01",
+    "date": "2026-01-30",
+    "desc": "GALON",
+    "amount": 25000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260131-01",
+    "date": "2026-01-31",
+    "desc": "GALON",
+    "amount": 15000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260131-02",
+    "date": "2026-01-31",
+    "desc": "KAKAK",
+    "amount": 10000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260202-01",
+    "date": "2026-02-02",
+    "desc": "GALON",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260204-01",
+    "date": "2026-02-04",
+    "desc": "GALON",
+    "amount": 30000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260205-01",
+    "date": "2026-02-05",
+    "desc": "SABUN",
+    "amount": 26000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260206-01",
+    "date": "2026-02-06",
+    "desc": "GALON",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260207-01",
+    "date": "2026-02-07",
+    "desc": "GALON",
+    "amount": 10000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260209-01",
+    "date": "2026-02-09",
+    "desc": "PISANG",
+    "amount": 60000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260209-02",
+    "date": "2026-02-09",
+    "desc": "GALON",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260210-01",
+    "date": "2026-02-10",
+    "desc": "GALON",
+    "amount": 10000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260212-01",
+    "date": "2026-02-12",
+    "desc": "kurangan pocari",
+    "amount": 10000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260212-02",
+    "date": "2026-02-12",
+    "desc": "GALON",
+    "amount": 25000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260213-01",
+    "date": "2026-02-13",
+    "desc": "TALI RAFIA",
+    "amount": 10000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260214-01",
+    "date": "2026-02-14",
+    "desc": "SOYJOY/ION",
+    "amount": 170500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260214-02",
+    "date": "2026-02-14",
+    "desc": "GALON",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260215-01",
+    "date": "2026-02-15",
+    "desc": "PLASTIK",
+    "amount": 7000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260216-01",
+    "date": "2026-02-16",
+    "desc": "HANDSANITIZER",
+    "amount": 90000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260217-01",
+    "date": "2026-02-17",
+    "desc": "GALON",
+    "amount": 35000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260220-01",
+    "date": "2026-02-20",
+    "desc": "KIT",
+    "amount": 33000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260220-02",
+    "date": "2026-02-20",
+    "desc": "GALON",
+    "amount": 5000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260221-01",
+    "date": "2026-02-21",
+    "desc": "GALON",
+    "amount": 25000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260223-01",
+    "date": "2026-02-23",
+    "desc": "GALON",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260225-01",
+    "date": "2026-02-25",
+    "desc": "KEKURANGAN PRIMA",
+    "amount": 17500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260227-01",
+    "date": "2026-02-27",
+    "desc": "KIT",
+    "amount": 28000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260228-01",
+    "date": "2026-02-28",
+    "desc": "GALON",
+    "amount": 30000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260303-01",
+    "date": "2026-03-03",
+    "desc": "GALON",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260305-01",
+    "date": "2026-03-05",
+    "desc": "GALON",
+    "amount": 10000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260306-01",
+    "date": "2026-03-06",
+    "desc": "HANDWASH",
+    "amount": 26000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260306-02",
+    "date": "2026-03-06",
+    "desc": "GALON",
+    "amount": 10000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260307-01",
+    "date": "2026-03-07",
+    "desc": "HANDSANITIZER",
+    "amount": 90000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260307-02",
+    "date": "2026-03-07",
+    "desc": "GALON",
+    "amount": 10000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260307-03",
+    "date": "2026-03-07",
+    "desc": "PAK JUN",
+    "amount": 10000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260307-04",
+    "date": "2026-03-07",
+    "desc": "BATRAI REMOTE TV",
+    "amount": 7000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260308-01",
+    "date": "2026-03-08",
+    "desc": "KIT",
+    "amount": 28000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260309-01",
+    "date": "2026-03-09",
+    "desc": "LEM",
+    "amount": 15000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260310-01",
+    "date": "2026-03-10",
+    "desc": "GALON",
+    "amount": 25000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260312-01",
+    "date": "2026-03-12",
+    "desc": "BATU TIMBANGAN",
+    "amount": 15000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260312-02",
+    "date": "2026-03-12",
+    "desc": "GALON",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260313-01",
+    "date": "2026-03-13",
+    "desc": "LEM KASTROL",
+    "amount": 7500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260317-01",
+    "date": "2026-03-17",
+    "desc": "GALON",
+    "amount": 15000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260318-01",
+    "date": "2026-03-18",
+    "desc": "GALON",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260323-01",
+    "date": "2026-03-23",
+    "desc": "LAKBAN",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260323-02",
+    "date": "2026-03-23",
+    "desc": "GALON",
+    "amount": 10000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260324-01",
+    "date": "2026-03-24",
+    "desc": "KEKURANGAN SERVICE AC",
+    "amount": 50000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260324-02",
+    "date": "2026-03-24",
+    "desc": "KABEL",
+    "amount": 50000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260325-01",
+    "date": "2026-03-25",
+    "desc": "ISOLATIF",
+    "amount": 24000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260325-02",
+    "date": "2026-03-25",
+    "desc": "BAUT",
+    "amount": 5000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260325-03",
+    "date": "2026-03-25",
+    "desc": "ISOLASI LISTRIK",
+    "amount": 6000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260325-04",
+    "date": "2026-03-25",
+    "desc": "GALON",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260325-05",
+    "date": "2026-03-25",
+    "desc": "PITING LAMPU + SELANG",
+    "amount": 16500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260328-01",
+    "date": "2026-03-28",
+    "desc": "GALON",
+    "amount": 25000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260328-02",
+    "date": "2026-03-28",
+    "desc": "KIT",
+    "amount": 33000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260329-01",
+    "date": "2026-03-29",
+    "desc": "ADIK",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260331-01",
+    "date": "2026-03-31",
+    "desc": "GALON",
+    "amount": 30000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260331-02",
+    "date": "2026-03-31",
+    "desc": "GANTI COVER JOK",
+    "amount": 80000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260402-01",
+    "date": "2026-04-02",
+    "desc": "GALON",
+    "amount": 33000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260404-01",
+    "date": "2026-04-04",
+    "desc": "POCARI",
+    "amount": 310000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260405-01",
+    "date": "2026-04-05",
+    "desc": "GALON",
+    "amount": 16000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260406-01",
+    "date": "2026-04-06",
+    "desc": "GALON",
+    "amount": 16500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260408-01",
+    "date": "2026-04-08",
+    "desc": "SOLASI",
+    "amount": 16000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260408-02",
+    "date": "2026-04-08",
+    "desc": "HANDSANITIZER",
+    "amount": 96000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260408-03",
+    "date": "2026-04-08",
+    "desc": "SABUN",
+    "amount": 30000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260408-04",
+    "date": "2026-04-08",
+    "desc": "GALON",
+    "amount": 22000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260409-01",
+    "date": "2026-04-09",
+    "desc": "DOUBLE TAPE",
+    "amount": 23000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260407-01",
+    "date": "2026-04-07",
+    "desc": "FRUTEA",
+    "amount": 168000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260407-02",
+    "date": "2026-04-07",
+    "desc": "GALON",
+    "amount": 27500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260411-01",
+    "date": "2026-04-11",
+    "desc": "GALON",
+    "amount": 33000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260410-01",
+    "date": "2026-04-10",
+    "desc": "CAT",
+    "amount": 70000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260410-02",
+    "date": "2026-04-10",
+    "desc": "GALON 2",
+    "amount": 11000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260410-03",
+    "date": "2026-04-10",
+    "desc": "PAK JUN",
+    "amount": 25000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260413-01",
+    "date": "2026-04-13",
+    "desc": "KIT",
+    "amount": 33000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260413-02",
+    "date": "2026-04-13",
+    "desc": "GALON",
+    "amount": 22000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260415-01",
+    "date": "2026-04-15",
+    "desc": "GALON",
+    "amount": 33000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260415-02",
+    "date": "2026-04-15",
+    "desc": "PISANG",
+    "amount": 60000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260415-03",
+    "date": "2026-04-15",
+    "desc": "PAKJUN",
+    "amount": 200000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260417-01",
+    "date": "2026-04-17",
+    "desc": "GALON",
+    "amount": 27500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260417-02",
+    "date": "2026-04-17",
+    "desc": "ALTEKO",
+    "amount": 6000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260418-01",
+    "date": "2026-04-18",
+    "desc": "GALON",
+    "amount": 11000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260418-02",
+    "date": "2026-04-18",
+    "desc": "WD",
+    "amount": 8000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260418-03",
+    "date": "2026-04-18",
+    "desc": "GALON",
+    "amount": 27500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260419-01",
+    "date": "2026-04-19",
+    "desc": "KUAS",
+    "amount": 8000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260420-01",
+    "date": "2026-04-20",
+    "desc": "PISANG",
+    "amount": 60000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260420-02",
+    "date": "2026-04-20",
+    "desc": "GALON",
+    "amount": 27500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260421-01",
+    "date": "2026-04-21",
+    "desc": "KIT",
+    "amount": 33000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260421-02",
+    "date": "2026-04-21",
+    "desc": "PAKU",
+    "amount": 3000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260422-01",
+    "date": "2026-04-22",
+    "desc": "GALON",
+    "amount": 27500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260423-02",
+    "date": "2026-04-23",
+    "desc": "GALON",
+    "amount": 27500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260425-01",
+    "date": "2026-04-25",
+    "desc": "GALON",
+    "amount": 33000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260427-01",
+    "date": "2026-04-27",
+    "desc": "GALON",
+    "amount": 11000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260427-02",
+    "date": "2026-04-27",
+    "desc": "LAKBAN",
+    "amount": 13000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260428-01",
+    "date": "2026-04-28",
+    "desc": "GALON",
+    "amount": 33000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260429-01",
+    "date": "2026-04-29",
+    "desc": "HANDSANITIZER",
+    "amount": 96000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260429-02",
+    "date": "2026-04-29",
+    "desc": "KIT",
+    "amount": 33000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260429-03",
+    "date": "2026-04-29",
+    "desc": "THINER",
+    "amount": 29000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260429-04",
+    "date": "2026-04-29",
+    "desc": "ROKOK",
+    "amount": 21000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260430-01",
+    "date": "2026-04-30",
+    "desc": "GALON",
+    "amount": 38500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260502-01",
+    "date": "2026-05-02",
+    "desc": "GALON",
+    "amount": 22000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260504-01",
+    "date": "2026-05-04",
+    "desc": "GALON",
+    "amount": 22000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260506-01",
+    "date": "2026-05-06",
+    "desc": "GALON",
+    "amount": 33000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260506-02",
+    "date": "2026-05-06",
+    "desc": "POCARI",
+    "amount": 300000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260507-01",
+    "date": "2026-05-07",
+    "desc": "SOLASI TAPE",
+    "amount": 32000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260508-01",
+    "date": "2026-05-08",
+    "desc": "BATU",
+    "amount": 13000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260509-01",
+    "date": "2026-05-09",
+    "desc": "SOLATIPE",
+    "amount": 10000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260509-02",
+    "date": "2026-05-09",
+    "desc": "GALON",
+    "amount": 22000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260511-01",
+    "date": "2026-05-11",
+    "desc": "GALON",
+    "amount": 22000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260512-01",
+    "date": "2026-05-12",
+    "desc": "PAKET BAPAK",
+    "amount": 460000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260512-03",
+    "date": "2026-05-12",
+    "desc": "GALON",
+    "amount": 27500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260513-01",
+    "date": "2026-05-13",
+    "desc": "SABUN",
+    "amount": 30000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260513-02",
+    "date": "2026-05-13",
+    "desc": "KIT",
+    "amount": 33000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260513-03",
+    "date": "2026-05-13",
+    "desc": "GALON",
+    "amount": 18000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260514-01",
+    "date": "2026-05-14",
+    "desc": "GALON",
+    "amount": 27500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260515-01",
+    "date": "2026-05-15",
+    "desc": "PAK JU",
+    "amount": 3000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260515-02",
+    "date": "2026-05-15",
+    "desc": "GALON",
+    "amount": 16500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260516-01",
+    "date": "2026-05-16",
+    "desc": "GALON",
+    "amount": 22000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260516-02",
+    "date": "2026-05-16",
+    "desc": "STIKER",
+    "amount": 35000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260518-01",
+    "date": "2026-05-18",
+    "desc": "GALON",
+    "amount": 27500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260518-02",
+    "date": "2026-05-18",
+    "desc": "KLEM",
+    "amount": 3500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260518-03",
+    "date": "2026-05-18",
+    "desc": "ISI LEM TEMBAK",
+    "amount": 18000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260519-01",
+    "date": "2026-05-19",
+    "desc": "TISSUE",
+    "amount": 47000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260519-02",
+    "date": "2026-05-19",
+    "desc": "GALON",
+    "amount": 27500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260520-01",
+    "date": "2026-05-20",
+    "desc": "GALON",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260521-01",
+    "date": "2026-05-21",
+    "desc": "GALON",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260522-01",
+    "date": "2026-05-22",
+    "desc": "GALON",
+    "amount": 16500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260523-01",
+    "date": "2026-05-23",
+    "desc": "GALON",
+    "amount": 22000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260524-01",
+    "date": "2026-05-24",
+    "desc": "GALON",
+    "amount": 27500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260525-01",
+    "date": "2026-05-25",
+    "desc": "GALON",
+    "amount": 16500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260526-01",
+    "date": "2026-05-26",
+    "desc": "GALON",
+    "amount": 16500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260528-01",
+    "date": "2026-05-28",
+    "desc": "MUR BAUT",
+    "amount": 6000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260528-02",
+    "date": "2026-05-28",
+    "desc": "GALON",
+    "amount": 27500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260529-01",
+    "date": "2026-05-29",
+    "desc": "GALON",
+    "amount": 11000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260530-01",
+    "date": "2026-05-30",
+    "desc": "GALON",
+    "amount": 22000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260530-02",
+    "date": "2026-05-30",
+    "desc": "FITBAR",
+    "amount": 295700,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260531-01",
+    "date": "2026-05-31",
+    "desc": "BAYAR HONEYMOON",
+    "amount": 141000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260601-01",
+    "date": "2026-06-01",
+    "desc": "GALON",
+    "amount": 16500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260602-01",
+    "date": "2026-06-02",
+    "desc": "GALON",
+    "amount": 22000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260602-02",
+    "date": "2026-06-02",
+    "desc": "PAK NO",
+    "amount": 100000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260604-01",
+    "date": "2026-06-04",
+    "desc": "GALON",
+    "amount": 22000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260604-02",
+    "date": "2026-06-04",
+    "desc": "ELNAD",
+    "amount": 5000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260605-01",
+    "date": "2026-06-05",
+    "desc": "GALON",
+    "amount": 66000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260606-01",
+    "date": "2026-06-06",
+    "desc": "TAMBAH ANGIN NMAX",
+    "amount": 3000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260609-01",
+    "date": "2026-06-09",
+    "desc": "GALON",
+    "amount": 16500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260609-02",
+    "date": "2026-06-09",
+    "desc": "TISSUE",
+    "amount": 43000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260608-01",
+    "date": "2026-06-08",
+    "desc": "POCARI",
+    "amount": 300000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260608-03",
+    "date": "2026-06-08",
+    "desc": "ELNAD (CUCI MOBIL)",
+    "amount": 50000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260610-01",
+    "date": "2026-06-10",
+    "desc": "BOTOL HANDSANITIZER",
+    "amount": 73500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260610-02",
+    "date": "2026-06-10",
+    "desc": "GALON",
+    "amount": 16500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260611-01",
+    "date": "2026-06-11",
+    "desc": "KIT",
+    "amount": 33000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260611-02",
+    "date": "2026-06-11",
+    "desc": "GALON",
+    "amount": 22000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260612-01",
+    "date": "2026-06-12",
+    "desc": "GALON",
+    "amount": 11000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260613-01",
+    "date": "2026-06-13",
+    "desc": "GALON",
+    "amount": 33000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260614-01",
+    "date": "2026-06-14",
+    "desc": "TISSUE",
+    "amount": 95000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260615-01",
+    "date": "2026-06-15",
+    "desc": "GALON",
+    "amount": 11000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260616-01",
+    "date": "2026-06-16",
+    "desc": "GALON",
+    "amount": 22000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260616-02",
+    "date": "2026-06-16",
+    "desc": "SABUN",
+    "amount": 30000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260616-03",
+    "date": "2026-06-16",
+    "desc": "SOLAR",
+    "amount": 100000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260618-01",
+    "date": "2026-06-18",
+    "desc": "GALON",
+    "amount": 27500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260618-02",
+    "date": "2026-06-18",
+    "desc": "GALON",
+    "amount": 15000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260620-01",
+    "date": "2026-06-20",
+    "desc": "GALON",
+    "amount": 22000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260622-01",
+    "date": "2026-06-22",
+    "desc": "GALON",
+    "amount": 27000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260623-01",
+    "date": "2026-06-23",
+    "desc": "GALON",
+    "amount": 27000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260623-02",
+    "date": "2026-06-23",
+    "desc": "GALON",
+    "amount": 10000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260630-01",
+    "date": "2026-06-30",
+    "desc": "KUAS",
+    "amount": 8000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260630-02",
+    "date": "2026-06-30",
+    "desc": "SELOTIP",
+    "amount": 8000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260630-03",
+    "date": "2026-06-30",
+    "desc": "HANDSANITIZER",
+    "amount": 96000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260630-04",
+    "date": "2026-06-30",
+    "desc": "GALON",
+    "amount": 16500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260624-01",
+    "date": "2026-06-24",
+    "desc": "KIT",
+    "amount": 33000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260624-02",
+    "date": "2026-06-24",
+    "desc": "GALON",
+    "amount": 11000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260626-01",
+    "date": "2026-06-26",
+    "desc": "GALON",
+    "amount": 33000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260627-02",
+    "date": "2026-06-27",
+    "desc": "GALON",
+    "amount": 27500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260628-01",
+    "date": "2026-06-28",
+    "desc": "BENSIN NMAX",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260628-02",
+    "date": "2026-06-28",
+    "desc": "PLASTIK",
+    "amount": 9500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260629-02",
+    "date": "2026-06-29",
+    "desc": "LEM KERTAS",
+    "amount": 8000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260629-03",
+    "date": "2026-06-29",
+    "desc": "GALON",
+    "amount": 11000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260701-01",
+    "date": "2026-07-01",
+    "desc": "GALON",
+    "amount": 16500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260702-01",
+    "date": "2026-07-02",
+    "desc": "GALON",
+    "amount": 16500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260704-01",
+    "date": "2026-07-04",
+    "desc": "TAGIHAN ION",
+    "amount": 75000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260704-02",
+    "date": "2026-07-04",
+    "desc": "GALON",
+    "amount": 27500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260706-01",
+    "date": "2026-07-06",
+    "desc": "GALON",
+    "amount": 27500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260707-01",
+    "date": "2026-07-07",
+    "desc": "GALON",
+    "amount": 16500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260709-01",
+    "date": "2026-07-09",
+    "desc": "GALON",
+    "amount": 27500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260710-01",
+    "date": "2026-07-10",
+    "desc": "HANDSANITIZER",
+    "amount": 64000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260710-02",
+    "date": "2026-07-10",
+    "desc": "GALON",
+    "amount": 17500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260710-03",
+    "date": "2026-07-10",
+    "desc": "GALON",
+    "amount": 15000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260711-01",
+    "date": "2026-07-11",
+    "desc": "KIT",
+    "amount": 33000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260711-02",
+    "date": "2026-07-11",
+    "desc": "GALON",
+    "amount": 5500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260713-01",
+    "date": "2026-07-13",
+    "desc": "GALON",
+    "amount": 16500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260713-02",
+    "date": "2026-07-13",
+    "desc": "SABUN",
+    "amount": 30000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260714-01",
+    "date": "2026-07-14",
+    "desc": "GALON",
+    "amount": 16500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260715-01",
+    "date": "2026-07-15",
+    "desc": "GALON",
+    "amount": 16500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260716-01",
+    "date": "2026-07-16",
+    "desc": "HANDSANITIZER",
+    "amount": 96000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260716-02",
+    "date": "2026-07-16",
+    "desc": "GALON",
+    "amount": 16500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260717-01",
+    "date": "2026-07-17",
+    "desc": "GALON",
+    "amount": 16500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260717-02",
+    "date": "2026-07-17",
+    "desc": "PEWANGI",
+    "amount": 26000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260718-01",
+    "date": "2026-07-18",
+    "desc": "GALON",
+    "amount": 22000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260718-02",
+    "date": "2026-07-18",
+    "desc": "BAUT",
+    "amount": 6000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260718-03",
+    "date": "2026-07-18",
+    "desc": "BUNDA",
+    "amount": 18000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260718-04",
+    "date": "2026-07-18",
+    "desc": "TISSUE",
+    "amount": 46000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260720-01",
+    "date": "2026-07-20",
+    "desc": "GALON",
+    "amount": 22000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260721-01",
+    "date": "2026-07-21",
+    "desc": "GALON",
+    "amount": 15500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260722-01",
+    "date": "2026-07-22",
+    "desc": "KIT",
+    "amount": 33000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260722-02",
+    "date": "2026-07-22",
+    "desc": "GALON",
+    "amount": 16500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260723-01",
+    "date": "2026-07-23",
+    "desc": "GALON",
+    "amount": 22000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260724-01",
+    "date": "2026-07-24",
+    "desc": "GALON",
+    "amount": 11000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260725-01",
+    "date": "2026-07-25",
+    "desc": "SERVIS PINTU",
+    "amount": 50000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260725-02",
+    "date": "2026-07-25",
+    "desc": "GALON",
+    "amount": 16500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260727-01",
+    "date": "2026-07-27",
+    "desc": "GALON",
+    "amount": 27500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260728-01",
+    "date": "2026-07-28",
+    "desc": "KIT",
+    "amount": 33000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260728-02",
+    "date": "2026-07-28",
+    "desc": "GALON",
+    "amount": 16500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260729-01",
+    "date": "2026-07-29",
+    "desc": "GALON",
+    "amount": 16500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260730-01",
+    "date": "2026-07-30",
+    "desc": "PAK JUN",
+    "amount": 50000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260730-02",
+    "date": "2026-07-30",
+    "desc": "GALON",
+    "amount": 16500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260731-01",
+    "date": "2026-07-31",
+    "desc": "GALON",
+    "amount": 16500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260801-01",
+    "date": "2026-08-01",
+    "desc": "GALON",
+    "amount": 11000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260801-02",
+    "date": "2026-08-01",
+    "desc": "SOYJOY",
+    "amount": 95000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260803-02",
+    "date": "2026-08-03",
+    "desc": "GALON",
+    "amount": 27500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260804-01",
+    "date": "2026-08-04",
+    "desc": "GALON",
+    "amount": 22000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260805-01",
+    "date": "2026-08-05",
+    "desc": "LEM BAKAR",
+    "amount": 12000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260805-02",
+    "date": "2026-08-05",
+    "desc": "LILIN",
+    "amount": 12500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260805-03",
+    "date": "2026-08-05",
+    "desc": "GALON",
+    "amount": 22000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260806-01",
+    "date": "2026-08-06",
+    "desc": "TISSUE",
+    "amount": 42500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260806-02",
+    "date": "2026-08-06",
+    "desc": "GALON",
+    "amount": 16500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260807-01",
+    "date": "2026-08-07",
+    "desc": "KIT",
+    "amount": 33000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260807-02",
+    "date": "2026-08-07",
+    "desc": "SABUN",
+    "amount": 30000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260807-03",
+    "date": "2026-08-07",
+    "desc": "GALON",
+    "amount": 16500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260808-01",
+    "date": "2026-08-08",
+    "desc": "GALON",
+    "amount": 16500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260809-01",
+    "date": "2026-08-09",
+    "desc": "ALTEKO",
+    "amount": 5000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260810-01",
+    "date": "2026-08-10",
+    "desc": "GALON",
+    "amount": 22000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260811-01",
+    "date": "2026-08-11",
+    "desc": "GALON",
+    "amount": 22000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260812-01",
+    "date": "2026-08-12",
+    "desc": "GALON",
+    "amount": 27500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260813-01",
+    "date": "2026-08-13",
+    "desc": "PLASTIK",
+    "amount": 9500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260814-01",
+    "date": "2026-08-14",
+    "desc": "GALON",
+    "amount": 16500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260814-02",
+    "date": "2026-08-14",
+    "desc": "POCARI",
+    "amount": 314400,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260815-01",
+    "date": "2026-08-15",
+    "desc": "GALON",
+    "amount": 16500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260817-01",
+    "date": "2026-08-17",
+    "desc": "GALON",
+    "amount": 33000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260818-01",
+    "date": "2026-08-18",
+    "desc": "GALON",
+    "amount": 11000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260819-01",
+    "date": "2026-08-19",
+    "desc": "GALON",
+    "amount": 16500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260820-01",
+    "date": "2026-08-20",
+    "desc": "FITBAR",
+    "amount": 315000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260820-02",
+    "date": "2026-08-20",
+    "desc": "GALON",
+    "amount": 22000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260821-01",
+    "date": "2026-08-21",
+    "desc": "GALON",
+    "amount": 16500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260821-02",
+    "date": "2026-08-21",
+    "desc": "TISSUE",
+    "amount": 14500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260822-01",
+    "date": "2026-08-22",
+    "desc": "HANDSANITIZER",
+    "amount": 96000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260822-02",
+    "date": "2026-08-22",
+    "desc": "GALON",
+    "amount": 22000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260823-01",
+    "date": "2026-08-23",
+    "desc": "TISSUE",
+    "amount": 34000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260824-01",
+    "date": "2026-08-24",
+    "desc": "TISSUE",
+    "amount": 45000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260824-02",
+    "date": "2026-08-24",
+    "desc": "GALON",
+    "amount": 27500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260825-01",
+    "date": "2026-08-25",
+    "desc": "GALON",
+    "amount": 11000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260826-01",
+    "date": "2026-08-26",
+    "desc": "HARPICK",
+    "amount": 25500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260827-01",
+    "date": "2026-08-27",
+    "desc": "KIT",
+    "amount": 33000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260827-02",
+    "date": "2026-08-27",
+    "desc": "GALON",
+    "amount": 33000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260828-01",
+    "date": "2026-08-28",
+    "desc": "GALON",
+    "amount": 16500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260829-01",
+    "date": "2026-08-29",
+    "desc": "GALON",
+    "amount": 16500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260829-02",
+    "date": "2026-08-29",
+    "desc": "ION",
+    "amount": 75000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260831-01",
+    "date": "2026-08-31",
+    "desc": "GALON",
+    "amount": 22000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260831-02",
+    "date": "2026-08-31",
+    "desc": "KERTAS KARTON",
+    "amount": 9500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260831-03",
+    "date": "2026-08-31",
+    "desc": "LEM",
+    "amount": 13000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260831-04",
+    "date": "2026-08-31",
+    "desc": "BENSIN",
+    "amount": 30000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260831-05",
+    "date": "2026-08-31",
+    "desc": "AC",
+    "amount": 230000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260901-01",
+    "date": "2026-09-01",
+    "desc": "PAK NO (MCB DLL)",
+    "amount": 72500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260901-02",
+    "date": "2026-09-01",
+    "desc": "SERVICE AC",
+    "amount": 250000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260901-03",
+    "date": "2026-09-01",
+    "desc": "GALON",
+    "amount": 27500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260901-04",
+    "date": "2026-09-01",
+    "desc": "HANDSANITIZER",
+    "amount": 96000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260902-01",
+    "date": "2026-09-02",
+    "desc": "KIT",
+    "amount": 33000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260902-02",
+    "date": "2026-09-02",
+    "desc": "SABUN",
+    "amount": 30000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260902-03",
+    "date": "2026-09-02",
+    "desc": "KERATS KARTON",
+    "amount": 10000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260902-04",
+    "date": "2026-09-02",
+    "desc": "PLASTIK LAMINATING",
+    "amount": 15000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260902-05",
+    "date": "2026-09-02",
+    "desc": "GALON",
+    "amount": 16500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260903-02",
+    "date": "2026-09-03",
+    "desc": "PAK JUN",
+    "amount": 50000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260904-01",
+    "date": "2026-09-04",
+    "desc": "KABEL",
+    "amount": 30000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260904-02",
+    "date": "2026-09-04",
+    "desc": "GALON",
+    "amount": 11000,
+    "paymentMethod": "Cash"
+  }
+]

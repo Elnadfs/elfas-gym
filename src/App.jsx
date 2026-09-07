@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import extractedMembers from './extracted_members.json';
+import extractedTransactions from './extracted_transactions.json';
+import extractedExpenses from './extracted_expenses.json';
+import extractedDailyVisitors from './extracted_daily_visitors.json';
 import gymLogo from './assets/logo.jpg';
 import * as db from './neonDb';
 
@@ -37,9 +40,9 @@ const defaultProducts = [
   { id: 'prod-22', name: 'Fruit tea', price: 5000, stock: 50 }
 ];
 
-const defaultDailyVisitors = [];
-const defaultExpenses = [];
-const defaultTransactions = [];
+const defaultDailyVisitors = extractedDailyVisitors;
+const defaultExpenses = extractedExpenses;
+const defaultTransactions = extractedTransactions;
 
 export default function App() {
   // Tabs: overview, members, daily_visitors, gym_store, packages, transactions, reports
@@ -57,7 +60,7 @@ export default function App() {
     if (local) {
       try {
         const parsed = JSON.parse(local);
-        if (Array.isArray(parsed) && parsed.length > 10) {
+        if (Array.isArray(parsed) && parsed.length >= defaultMembers.length) {
           return parsed;
         }
       } catch (e) {}
@@ -80,7 +83,9 @@ export default function App() {
     if (local) {
       try {
         const parsed = JSON.parse(local);
-        return parsed.filter(d => !d.id.startsWith('DLY-00'));
+        if (Array.isArray(parsed) && parsed.length >= defaultDailyVisitors.length) {
+          return parsed;
+        }
       } catch (e) {}
     }
     return defaultDailyVisitors;
@@ -97,7 +102,9 @@ export default function App() {
     if (local) {
       try {
         const parsed = JSON.parse(local);
-        return parsed.filter(t => !t.id.startsWith('TX-100'));
+        if (Array.isArray(parsed) && parsed.length >= defaultTransactions.length) {
+          return parsed;
+        }
       } catch (e) {}
     }
     return defaultTransactions;
@@ -108,7 +115,9 @@ export default function App() {
     if (local) {
       try {
         const parsed = JSON.parse(local);
-        return parsed.filter(e => !e.id.startsWith('EXP-100'));
+        if (Array.isArray(parsed) && parsed.length >= defaultExpenses.length) {
+          return parsed;
+        }
       } catch (e) {}
     }
     return defaultExpenses;
