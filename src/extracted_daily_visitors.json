@@ -65482,33 +65482,29 @@
   {
     "id": "DLY-20260905-001",
     "name": "SIDIQ",
-    "phone": "-",
-    "date": "2026-09-05",
     "amountPaid": 20000,
+    "date": "2026-09-05",
     "paymentMethod": "Cash"
   },
   {
     "id": "DLY-20260905-002",
     "name": "ATINA",
-    "phone": "-",
-    "date": "2026-09-05",
     "amountPaid": 20000,
-    "paymentMethod": "Cash"
+    "date": "2026-09-05",
+    "paymentMethod": "QRIS"
   },
   {
     "id": "DLY-20260905-003",
     "name": "ERIC",
-    "phone": "-",
-    "date": "2026-09-05",
     "amountPaid": 20000,
+    "date": "2026-09-05",
     "paymentMethod": "Cash"
   },
   {
     "id": "DLY-20260905-004",
     "name": "GIAS",
-    "phone": "-",
-    "date": "2026-09-05",
     "amountPaid": 20000,
-    "paymentMethod": "Cash"
+    "date": "2026-09-05",
+    "paymentMethod": "QRIS"
   }
 ]
