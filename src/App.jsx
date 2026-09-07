@@ -54,17 +54,23 @@ export default function App() {
     setIsMobileNavOpen(false);
   };
   
+  // Data Versioning for automatic client cache invalidation and synchronization
+  const CURRENT_DATA_VERSION = '2026-09-07-v4';
+
   // Data States
   const [members, setMembers] = useState(() => {
-    const local = localStorage.getItem('gymfit_members');
-    if (local) {
-      try {
-        const parsed = JSON.parse(local);
-        if (Array.isArray(parsed) && parsed.length >= defaultMembers.length) {
-          return parsed;
+    try {
+      const savedVersion = localStorage.getItem('gymfit_data_version');
+      if (savedVersion === CURRENT_DATA_VERSION) {
+        const local = localStorage.getItem('gymfit_members');
+        if (local) {
+          const parsed = JSON.parse(local);
+          if (Array.isArray(parsed) && parsed.length >= defaultMembers.length) {
+            return parsed;
+          }
         }
-      } catch (e) {}
-    }
+      }
+    } catch (e) {}
     return defaultMembers;
   });
   
@@ -79,15 +85,18 @@ export default function App() {
   });
 
   const [dailyVisitors, setDailyVisitors] = useState(() => {
-    const local = localStorage.getItem('gymfit_daily_visitors');
-    if (local) {
-      try {
-        const parsed = JSON.parse(local);
-        if (Array.isArray(parsed) && parsed.length >= defaultDailyVisitors.length) {
-          return parsed;
+    try {
+      const savedVersion = localStorage.getItem('gymfit_data_version');
+      if (savedVersion === CURRENT_DATA_VERSION) {
+        const local = localStorage.getItem('gymfit_daily_visitors');
+        if (local) {
+          const parsed = JSON.parse(local);
+          if (Array.isArray(parsed) && parsed.length >= defaultDailyVisitors.length) {
+            return parsed;
+          }
         }
-      } catch (e) {}
-    }
+      }
+    } catch (e) {}
     return defaultDailyVisitors;
   });
 
@@ -98,28 +107,34 @@ export default function App() {
   const [dailyPriceSaved, setDailyPriceSaved] = useState(false);
   
   const [transactions, setTransactions] = useState(() => {
-    const local = localStorage.getItem('gymfit_transactions');
-    if (local) {
-      try {
-        const parsed = JSON.parse(local);
-        if (Array.isArray(parsed) && parsed.length >= defaultTransactions.length) {
-          return parsed;
+    try {
+      const savedVersion = localStorage.getItem('gymfit_data_version');
+      if (savedVersion === CURRENT_DATA_VERSION) {
+        const local = localStorage.getItem('gymfit_transactions');
+        if (local) {
+          const parsed = JSON.parse(local);
+          if (Array.isArray(parsed) && parsed.length >= defaultTransactions.length) {
+            return parsed;
+          }
         }
-      } catch (e) {}
-    }
+      }
+    } catch (e) {}
     return defaultTransactions;
   });
 
   const [expenses, setExpenses] = useState(() => {
-    const local = localStorage.getItem('gymfit_expenses');
-    if (local) {
-      try {
-        const parsed = JSON.parse(local);
-        if (Array.isArray(parsed) && parsed.length >= defaultExpenses.length) {
-          return parsed;
+    try {
+      const savedVersion = localStorage.getItem('gymfit_data_version');
+      if (savedVersion === CURRENT_DATA_VERSION) {
+        const local = localStorage.getItem('gymfit_expenses');
+        if (local) {
+          const parsed = JSON.parse(local);
+          if (Array.isArray(parsed) && parsed.length >= defaultExpenses.length) {
+            return parsed;
+          }
         }
-      } catch (e) {}
-    }
+      }
+    } catch (e) {}
     return defaultExpenses;
   });
 
@@ -127,6 +142,24 @@ export default function App() {
     const local = localStorage.getItem('gymfit_attendance_logs');
     return local ? JSON.parse(local) : [];
   });
+
+  // Auto-sync client state when a new master dataset version is released
+  useEffect(() => {
+    try {
+      const savedVersion = localStorage.getItem('gymfit_data_version');
+      if (savedVersion !== CURRENT_DATA_VERSION) {
+        localStorage.setItem('gymfit_data_version', CURRENT_DATA_VERSION);
+        localStorage.setItem('gymfit_members', JSON.stringify(defaultMembers));
+        localStorage.setItem('gymfit_transactions', JSON.stringify(defaultTransactions));
+        localStorage.setItem('gymfit_daily_visitors', JSON.stringify(defaultDailyVisitors));
+        localStorage.setItem('gymfit_expenses', JSON.stringify(defaultExpenses));
+        setMembers(defaultMembers);
+        setTransactions(defaultTransactions);
+        setDailyVisitors(defaultDailyVisitors);
+        setExpenses(defaultExpenses);
+      }
+    } catch (e) {}
+  }, []);
 
   // Sync lightweight configuration to LocalStorage safely
   useEffect(() => {
@@ -426,17 +459,20 @@ export default function App() {
   };
 
   const getStatus = (endDateStr) => {
+    if (!endDateStr) return 'Expired';
     const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const endDate = new Date(endDateStr);
-    endDate.setHours(0, 0, 0, 0);
-    return endDate >= today ? 'Active' : 'Expired';
+    const todayStr = formatLocalDateStr(today);
+    return endDateStr >= todayStr ? 'Active' : 'Expired';
   };
 
   const getDaysRemaining = (endDateStr) => {
+    if (!endDateStr) return -1;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const endDate = new Date(endDateStr);
+    const parts = endDateStr.split('-');
+    if (parts.length < 3) return -1;
+    const endDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+    endDate.setHours(0, 0, 0, 0);
     const diffTime = endDate - today;
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays;
