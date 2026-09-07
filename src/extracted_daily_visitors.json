@@ -65482,29 +65482,193 @@
   {
     "id": "DLY-20260905-001",
     "name": "SIDIQ",
-    "amountPaid": 20000,
+    "phone": "-",
     "date": "2026-09-05",
-    "paymentMethod": "Cash"
+    "amountPaid": 20000,
+    "paymentMethod": "QRIS"
   },
   {
     "id": "DLY-20260905-002",
     "name": "ATINA",
-    "amountPaid": 20000,
+    "phone": "-",
     "date": "2026-09-05",
+    "amountPaid": 20000,
     "paymentMethod": "QRIS"
   },
   {
     "id": "DLY-20260905-003",
     "name": "ERIC",
-    "amountPaid": 20000,
+    "phone": "-",
     "date": "2026-09-05",
-    "paymentMethod": "Cash"
+    "amountPaid": 20000,
+    "paymentMethod": "QRIS"
   },
   {
     "id": "DLY-20260905-004",
     "name": "GIAS",
-    "amountPaid": 20000,
+    "phone": "-",
     "date": "2026-09-05",
+    "amountPaid": 20000,
     "paymentMethod": "QRIS"
+  },
+  {
+    "id": "DLY-20260905-005",
+    "name": "ALESA",
+    "phone": "-",
+    "date": "2026-09-05",
+    "amountPaid": 20000,
+    "paymentMethod": "QRIS"
+  },
+  {
+    "id": "DLY-20260905-006",
+    "name": "SYAHRUL",
+    "phone": "-",
+    "date": "2026-09-05",
+    "amountPaid": 20000,
+    "paymentMethod": "QRIS"
+  },
+  {
+    "id": "DLY-20260905-007",
+    "name": "IVO",
+    "phone": "-",
+    "date": "2026-09-05",
+    "amountPaid": 20000,
+    "paymentMethod": "QRIS"
+  },
+  {
+    "id": "DLY-20260905-008",
+    "name": "AYUB",
+    "phone": "-",
+    "date": "2026-09-05",
+    "amountPaid": 20000,
+    "paymentMethod": "QRIS"
+  },
+  {
+    "id": "DLY-20260905-009",
+    "name": "WILDAN",
+    "phone": "-",
+    "date": "2026-09-05",
+    "amountPaid": 20000,
+    "paymentMethod": "QRIS"
+  },
+  {
+    "id": "DLY-20260905-010",
+    "name": "KUMANG",
+    "phone": "-",
+    "date": "2026-09-05",
+    "amountPaid": 20000,
+    "paymentMethod": "QRIS"
+  },
+  {
+    "id": "DLY-20260905-011",
+    "name": "SAM",
+    "phone": "-",
+    "date": "2026-09-05",
+    "amountPaid": 20000,
+    "paymentMethod": "QRIS"
+  },
+  {
+    "id": "DLY-20260905-012",
+    "name": "BINTI",
+    "phone": "-",
+    "date": "2026-09-05",
+    "amountPaid": 20000,
+    "paymentMethod": "QRIS"
+  },
+  {
+    "id": "DLY-20260905-013",
+    "name": "NADIA",
+    "phone": "-",
+    "date": "2026-09-05",
+    "amountPaid": 20000,
+    "paymentMethod": "QRIS"
+  },
+  {
+    "id": "DLY-20260905-014",
+    "name": "AYA",
+    "phone": "-",
+    "date": "2026-09-05",
+    "amountPaid": 20000,
+    "paymentMethod": "QRIS"
+  },
+  {
+    "id": "DLY-20260905-015",
+    "name": "FADLI",
+    "phone": "-",
+    "date": "2026-09-05",
+    "amountPaid": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "DLY-20260905-016",
+    "name": "PAK DWI",
+    "phone": "-",
+    "date": "2026-09-05",
+    "amountPaid": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "DLY-20260905-017",
+    "name": "INDAH",
+    "phone": "-",
+    "date": "2026-09-05",
+    "amountPaid": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "DLY-20260905-018",
+    "name": "DIAH",
+    "phone": "-",
+    "date": "2026-09-05",
+    "amountPaid": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "DLY-20260905-019",
+    "name": "ALVIN",
+    "phone": "-",
+    "date": "2026-09-05",
+    "amountPaid": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "DLY-20260905-020",
+    "name": "DAVID",
+    "phone": "-",
+    "date": "2026-09-05",
+    "amountPaid": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "DLY-20260905-021",
+    "name": "APRIL",
+    "phone": "-",
+    "date": "2026-09-05",
+    "amountPaid": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "DLY-20260905-022",
+    "name": "VIDI",
+    "phone": "-",
+    "date": "2026-09-05",
+    "amountPaid": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "DLY-20260905-023",
+    "name": "RATU",
+    "phone": "-",
+    "date": "2026-09-05",
+    "amountPaid": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "DLY-20260905-024",
+    "name": "RIDWAN",
+    "phone": "-",
+    "date": "2026-09-05",
+    "amountPaid": 20000,
+    "paymentMethod": "Cash"
   }
 ]

@@ -2077,5 +2077,26 @@
     "desc": "GALON",
     "amount": 11000,
     "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260905-01",
+    "date": "2026-09-05",
+    "desc": "STEKER",
+    "amount": 12000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260905-02",
+    "date": "2026-09-05",
+    "desc": "GALON",
+    "amount": 27500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260905-03",
+    "date": "2026-09-05",
+    "desc": "LAMPU",
+    "amount": 40000,
+    "paymentMethod": "Cash"
   }
 ]
