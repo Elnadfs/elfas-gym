@@ -307,6 +307,8 @@ export default function App() {
           if (!isNaN(p) && p > 0) setDailyPrice(p);
         }
         setCloudSyncStatus('connected');
+      } else {
+        setCloudSyncStatus('offline');
       }
     } catch (err) {
       console.warn('Neon Postgres sync notice:', err);
@@ -317,10 +319,10 @@ export default function App() {
   useEffect(() => {
     refreshCloudData();
     
-    // Auto-poll every 6 seconds for multi-device live sync
+    // Auto-poll periodically every 60 seconds (optimized to preserve bandwidth and quota)
     const interval = setInterval(() => {
       refreshCloudData();
-    }, 6000);
+    }, 60000);
 
     return () => clearInterval(interval);
   }, []);
@@ -1631,10 +1633,10 @@ export default function App() {
               width: '8px', 
               height: '8px', 
               borderRadius: '50%', 
-              backgroundColor: cloudSyncStatus === 'connected' ? 'var(--success)' : 'var(--warning)',
-              boxShadow: cloudSyncStatus === 'connected' ? '0 0 8px var(--success)' : 'none'
+              backgroundColor: cloudSyncStatus === 'connected' ? 'var(--success)' : cloudSyncStatus === 'syncing' ? 'var(--accent)' : '#38bdf8',
+              boxShadow: cloudSyncStatus === 'connected' ? '0 0 8px var(--success)' : cloudSyncStatus === 'offline' ? '0 0 6px rgba(56, 189, 248, 0.5)' : 'none'
             }} 
-            title={cloudSyncStatus === 'connected' ? 'Database Cloud: Live Realtime' : 'Database Cloud: Syncing/Lokal'} 
+            title={cloudSyncStatus === 'connected' ? 'Database Cloud: Live Realtime' : cloudSyncStatus === 'syncing' ? 'Database Cloud: Menghubungkan...' : 'Database: Mode Lokal Mandiri (Data Lengkap & Stabil)'} 
           />
           <div className="user-avatar" style={{ width: '34px', height: '34px', fontSize: '0.9rem' }}>
             {currentUser.name ? currentUser.name.charAt(0) : 'U'}
@@ -1725,14 +1727,14 @@ export default function App() {
         <div style={{ padding: '8px 16px', borderTop: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem' }}>
           <span style={{ color: 'var(--text-muted)' }}>Database Cloud:</span>
           <span style={{ 
-            color: cloudSyncStatus === 'connected' ? 'var(--success)' : cloudSyncStatus === 'syncing' ? 'var(--accent)' : 'var(--warning)',
+            color: cloudSyncStatus === 'connected' ? 'var(--success)' : cloudSyncStatus === 'syncing' ? 'var(--accent)' : '#38bdf8',
             fontWeight: '600',
             display: 'flex',
             alignItems: 'center',
             gap: '5px'
           }}>
-            <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: cloudSyncStatus === 'connected' ? 'var(--success)' : cloudSyncStatus === 'syncing' ? 'var(--accent)' : 'var(--warning)', display: 'inline-block' }}></span>
-            {cloudSyncStatus === 'connected' ? 'Live Realtime' : cloudSyncStatus === 'syncing' ? 'Sinkronisasi...' : 'Lokal Mode'}
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: cloudSyncStatus === 'connected' ? 'var(--success)' : cloudSyncStatus === 'syncing' ? 'var(--accent)' : '#38bdf8', display: 'inline-block' }}></span>
+            {cloudSyncStatus === 'connected' ? 'Live Cloud' : cloudSyncStatus === 'syncing' ? 'Sinkronisasi...' : 'Mode Mandiri (Stabil)'}
           </span>
         </div>
 
