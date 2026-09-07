@@ -286,7 +286,16 @@ export default function App() {
     try {
       const data = await db.fetchAllData();
       if (data) {
-        if (data.members && data.members.length > 0) setMembers(data.members);
+        if (data.members && data.members.length >= defaultMembers.length) {
+          setMembers(data.members);
+        } else if (data.members && data.members.length > 0) {
+          setMembers(prev => {
+            const map = new Map();
+            defaultMembers.forEach(m => map.set(m.id, m));
+            data.members.forEach(m => map.set(m.id, m));
+            return Array.from(map.values());
+          });
+        }
         if (data.transactions) setTransactions(data.transactions);
         if (data.attendanceLogs) setAttendanceLogs(data.attendanceLogs);
         if (data.expenses) setExpenses(data.expenses);
@@ -319,6 +328,7 @@ export default function App() {
   // Search & Filter States
   const [memberSearch, setMemberSearch] = useState('');
   const [memberFilterStatus, setMemberFilterStatus] = useState('all');
+  const [memberSortOrder, setMemberSortOrder] = useState('id-desc'); // 'id-desc', 'id-asc', 'name-asc'
   const [memberPage, setMemberPage] = useState(1);
   const [memberPageSize, setMemberPageSize] = useState(25);
   const [dailySearch, setDailySearch] = useState('');
@@ -2306,23 +2316,45 @@ export default function App() {
 
         {/* MEMBERS TAB */}
         {activeTab === 'members' && (() => {
-          const s = memberSearch.toLowerCase();
+          const s = memberSearch.toLowerCase().trim();
+          const sNum = s.replace(/\D/g, '');
+
           const filteredMembers = members.filter(m => {
-            const matchesSearch = (m.name && m.name.toLowerCase().includes(s)) || 
+            const mIdNum = m.id.replace(/\D/g, '');
+            const matchesSearch = !s || 
+                                  (m.name && m.name.toLowerCase().includes(s)) || 
                                   (m.phone && m.phone.includes(s)) || 
-                                  (m.id && m.id.toLowerCase().includes(s));
+                                  (m.id && m.id.toLowerCase().includes(s)) ||
+                                  (sNum && mIdNum.includes(sNum));
             const status = getStatus(m.endDate);
             const matchesFilter = memberFilterStatus === 'all' || status === memberFilterStatus;
             return matchesSearch && matchesFilter;
           });
 
-          const totalPages = Math.max(1, Math.ceil(filteredMembers.length / memberPageSize));
+          const sortedMembers = [...filteredMembers].sort((a, b) => {
+            if (memberSortOrder === 'id-desc') {
+              const numA = parseInt(a.id.replace(/\D/g, '')) || 0;
+              const numB = parseInt(b.id.replace(/\D/g, '')) || 0;
+              return numB - numA;
+            }
+            if (memberSortOrder === 'id-asc') {
+              const numA = parseInt(a.id.replace(/\D/g, '')) || 0;
+              const numB = parseInt(b.id.replace(/\D/g, '')) || 0;
+              return numA - numB;
+            }
+            if (memberSortOrder === 'name-asc') {
+              return (a.name || '').localeCompare(b.name || '');
+            }
+            return 0;
+          });
+
+          const totalPages = Math.max(1, Math.ceil(sortedMembers.length / memberPageSize));
           const safePage = Math.min(memberPage, totalPages);
           const startIndex = (safePage - 1) * memberPageSize;
-          const paginatedList = filteredMembers.slice(startIndex, startIndex + memberPageSize);
+          const paginatedList = sortedMembers.slice(startIndex, startIndex + memberPageSize);
 
           const handleReloadElfasData = async () => {
-    if (window.confirm(`Muat ulang dan sinkronkan master (${extractedMembers.length} member) ke Vercel Neon Database?`)) {
+    if (window.confirm(`Muat ulang dan sinkronkan master (${extractedMembers.length} member) ke database?`)) {
       setMembers(extractedMembers);
       localStorage.setItem('gymfit_members', JSON.stringify(extractedMembers));
       setMemberPage(1);
@@ -2333,7 +2365,7 @@ export default function App() {
           await db.saveMember(m);
         }
         setCloudSyncStatus('connected');
-        alert('🎉 2.110 Member berhasil disinkronkan ke Vercel Postgres Database!');
+        alert(`🎉 ${extractedMembers.length} Member berhasil disinkronkan ke database!`);
       } catch (e) {
         console.error(e);
         alert('Gagal sinkron. Periksa koneksi internet.');
@@ -2352,9 +2384,9 @@ export default function App() {
                       Quick Check-In Kehadiran Member (Ketik ID / No / Nama):
                     </label>
                     <input 
-                      type="text"
+                      type="text" 
                       className="form-control"
-                      placeholder="Ketik ID (contoh: 0001, 289) atau Nama member lalu Tekan Enter..."
+                      placeholder="Ketik ID (contoh: 0001, 2137, 2140) atau Nama member lalu Tekan Enter..."
                       value={quickCheckInInput}
                       onChange={(e) => setQuickCheckInInput(e.target.value)}
                       style={{ padding: '8px 12px', fontSize: '0.9rem' }}
@@ -2406,20 +2438,21 @@ export default function App() {
               {/* Members Table Card */}
               <div className="card-table-wrapper">
                 <div className="table-header" style={{ flexWrap: 'wrap', gap: '12px' }}>
-                  <div className="table-search" style={{ flex: '1 1 300px' }}>
+                  <div className="table-search" style={{ flex: '1 1 320px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                     <input 
                       type="text" 
                       className="search-input" 
-                      placeholder="Cari member (Nama, ID: MBR-..., Telepon)..."
+                      placeholder="Cari member (Nama, ID: 2137, Telepon)..."
                       value={memberSearch}
                       onChange={(e) => {
                         setMemberSearch(e.target.value);
                         setMemberPage(1);
                       }}
+                      style={{ minWidth: '180px', flex: '1' }}
                     />
                     <select 
                       className="select-input" 
-                      style={{ maxWidth: '150px' }}
+                      style={{ maxWidth: '140px' }}
                       value={memberFilterStatus}
                       onChange={(e) => {
                         setMemberFilterStatus(e.target.value);
@@ -2429,6 +2462,19 @@ export default function App() {
                       <option value="all">Semua Status</option>
                       <option value="Active">Aktif</option>
                       <option value="Expired">Expired</option>
+                    </select>
+                    <select 
+                      className="select-input" 
+                      style={{ maxWidth: '170px' }}
+                      value={memberSortOrder}
+                      onChange={(e) => {
+                        setMemberSortOrder(e.target.value);
+                        setMemberPage(1);
+                      }}
+                    >
+                      <option value="id-desc">ID Terbesar (Terbaru)</option>
+                      <option value="id-asc">ID Terkecil (0001)</option>
+                      <option value="name-asc">Nama A-Z</option>
                     </select>
                   </div>
 
