@@ -990,6 +990,17 @@
     "historyCount": 4
   },
   {
+    "id": "MBR-0100",
+    "name": "ANINDITA D",
+    "phone": "-",
+    "packageId": "pkg-1",
+    "startDate": "2026-01-01",
+    "endDate": "2026-02-01",
+    "totalVisits": 79,
+    "historyCount": 1,
+    "lastVisit": null
+  },
+  {
     "id": "MBR-0101",
     "name": "FAJAR",
     "phone": "-",
@@ -1600,6 +1611,17 @@
     "historyCount": 1
   },
   {
+    "id": "MBR-0162",
+    "name": "ILYAS",
+    "phone": "-",
+    "packageId": "pkg-1",
+    "startDate": "2025-11-01",
+    "endDate": "2026-06-23",
+    "totalVisits": 114,
+    "historyCount": 7,
+    "lastVisit": null
+  },
+  {
     "id": "MBR-0163",
     "name": "IAN",
     "phone": "-",
@@ -1948,6 +1970,17 @@
     "endDate": "2026-02-01",
     "totalVisits": 1,
     "historyCount": 1
+  },
+  {
+    "id": "MBR-0198",
+    "name": "ADRIAN CAHYO",
+    "phone": "-",
+    "packageId": "pkg-1",
+    "startDate": "2026-01-01",
+    "endDate": "2026-02-01",
+    "totalVisits": 85,
+    "historyCount": 1,
+    "lastVisit": null
   },
   {
     "id": "MBR-0200",
@@ -2848,6 +2881,17 @@
     "endDate": "2026-10-01",
     "totalVisits": 1,
     "historyCount": 8
+  },
+  {
+    "id": "MBR-0290",
+    "name": "FARHAN WAHYU",
+    "phone": "-",
+    "packageId": "pkg-1",
+    "startDate": "2026-01-01",
+    "endDate": "2026-02-01",
+    "totalVisits": 7,
+    "historyCount": 1,
+    "lastVisit": null
   },
   {
     "id": "MBR-0291",
@@ -4560,6 +4604,17 @@
     "historyCount": 6
   },
   {
+    "id": "MBR-0462",
+    "name": "DWI PERSIHARJO",
+    "phone": "-",
+    "packageId": "pkg-1",
+    "startDate": "2026-01-01",
+    "endDate": "2026-02-01",
+    "totalVisits": 21,
+    "historyCount": 1,
+    "lastVisit": null
+  },
+  {
     "id": "MBR-0463",
     "name": "AMIRUL",
     "phone": "-",
@@ -5348,6 +5403,17 @@
     "endDate": "2026-02-01",
     "totalVisits": 2,
     "historyCount": 1
+  },
+  {
+    "id": "MBR-0542",
+    "name": "AMIN",
+    "phone": "-",
+    "packageId": "pkg-1",
+    "startDate": "2026-01-01",
+    "endDate": "2026-02-01",
+    "totalVisits": 6,
+    "historyCount": 1,
+    "lastVisit": null
   },
   {
     "id": "MBR-0543",
@@ -7438,6 +7504,17 @@
     "endDate": "2026-02-01",
     "totalVisits": 8,
     "historyCount": 1
+  },
+  {
+    "id": "MBR-0752",
+    "name": "BU PUTRI",
+    "phone": "-",
+    "packageId": "pkg-1",
+    "startDate": "2025-09-04",
+    "endDate": "2025-11-27",
+    "totalVisits": 49,
+    "historyCount": 7,
+    "lastVisit": null
   },
   {
     "id": "MBR-0753",
@@ -13480,6 +13557,17 @@
     "historyCount": 1
   },
   {
+    "id": "MBR-1357",
+    "name": "MELINA",
+    "phone": "-",
+    "packageId": "pkg-1",
+    "startDate": "2026-01-01",
+    "endDate": "2026-02-01",
+    "totalVisits": 5,
+    "historyCount": 1,
+    "lastVisit": null
+  },
+  {
     "id": "MBR-1358",
     "name": "DESI S",
     "phone": "-",
@@ -14718,6 +14806,17 @@
     "endDate": "2025-11-14",
     "totalVisits": 7,
     "historyCount": 4
+  },
+  {
+    "id": "MBR-1482",
+    "name": "INEZ",
+    "phone": "-",
+    "packageId": "pkg-1",
+    "startDate": "2026-01-01",
+    "endDate": "2026-02-01",
+    "totalVisits": 1,
+    "historyCount": 1,
+    "lastVisit": null
   },
   {
     "id": "MBR-1483",
@@ -18670,6 +18769,17 @@
     "historyCount": 2
   },
   {
+    "id": "MBR-1878",
+    "name": "ASETI",
+    "phone": "-",
+    "packageId": "pkg-1",
+    "startDate": "2026-01-01",
+    "endDate": "2026-02-01",
+    "totalVisits": 1,
+    "historyCount": 1,
+    "lastVisit": null
+  },
+  {
     "id": "MBR-1879",
     "name": "SEPTIAN B",
     "phone": "-",
@@ -18900,6 +19010,17 @@
     "historyCount": 5
   },
   {
+    "id": "MBR-1902",
+    "name": "GILBRAN",
+    "phone": "-",
+    "packageId": "pkg-1",
+    "startDate": "2025-11-05",
+    "endDate": "2026-04-01",
+    "totalVisits": 63,
+    "historyCount": 11,
+    "lastVisit": null
+  },
+  {
     "id": "MBR-1903",
     "name": "GILANG P",
     "phone": "-",
@@ -18928,6 +19049,17 @@
     "endDate": "2026-07-13",
     "totalVisits": 36,
     "historyCount": 2
+  },
+  {
+    "id": "MBR-1906",
+    "name": "DANI",
+    "phone": "-",
+    "packageId": "pkg-1",
+    "startDate": "2025-04-26",
+    "endDate": "2026-02-01",
+    "totalVisits": 26,
+    "historyCount": 2,
+    "lastVisit": null
   },
   {
     "id": "MBR-1907",
@@ -19220,6 +19352,17 @@
     "historyCount": 2
   },
   {
+    "id": "MBR-1936",
+    "name": "ANDRI",
+    "phone": "-",
+    "packageId": "pkg-1",
+    "startDate": "2025-11-11",
+    "endDate": "2024-11-08",
+    "totalVisits": 33,
+    "historyCount": 8,
+    "lastVisit": null
+  },
+  {
     "id": "MBR-1937",
     "name": "RIZKI P",
     "phone": "-",
@@ -19448,6 +19591,17 @@
     "endDate": "2026-09-12",
     "totalVisits": 75,
     "historyCount": 5
+  },
+  {
+    "id": "MBR-1960",
+    "name": "GIVARI D",
+    "phone": "-",
+    "packageId": "pkg-1",
+    "startDate": "2026-01-01",
+    "endDate": "2026-02-01",
+    "totalVisits": 22,
+    "historyCount": 1,
+    "lastVisit": null
   },
   {
     "id": "MBR-1961",
@@ -19760,6 +19914,17 @@
     "historyCount": 2
   },
   {
+    "id": "MBR-1992",
+    "name": "ADRIAN D",
+    "phone": "-",
+    "packageId": "pkg-1",
+    "startDate": "2026-04-02",
+    "endDate": "2026-02-01",
+    "totalVisits": 23,
+    "historyCount": 2,
+    "lastVisit": null
+  },
+  {
     "id": "MBR-1993",
     "name": "SALMA A",
     "phone": "-",
@@ -20020,6 +20185,17 @@
     "historyCount": 2
   },
   {
+    "id": "MBR-2019",
+    "name": "NANA S",
+    "phone": "-",
+    "packageId": "pkg-1",
+    "startDate": "2026-04-13",
+    "endDate": "2026-02-01",
+    "totalVisits": 33,
+    "historyCount": 2,
+    "lastVisit": null
+  },
+  {
     "id": "MBR-2020",
     "name": "HEMANTA S",
     "phone": "-",
@@ -20078,6 +20254,17 @@
     "endDate": "2026-09-17",
     "totalVisits": 80,
     "historyCount": 4
+  },
+  {
+    "id": "MBR-2026",
+    "name": "FAJAR JISUNG",
+    "phone": "-",
+    "packageId": "pkg-1",
+    "startDate": "2026-04-28",
+    "endDate": "2026-02-01",
+    "totalVisits": 32,
+    "historyCount": 2,
+    "lastVisit": null
   },
   {
     "id": "MBR-2027",
@@ -20438,6 +20625,17 @@
     "endDate": "2026-09-24",
     "totalVisits": 89,
     "historyCount": 3
+  },
+  {
+    "id": "MBR-2063",
+    "name": "ZAKA A",
+    "phone": "-",
+    "packageId": "pkg-1",
+    "startDate": "2026-01-01",
+    "endDate": "2026-02-01",
+    "totalVisits": 65,
+    "historyCount": 1,
+    "lastVisit": null
   },
   {
     "id": "MBR-2064",
