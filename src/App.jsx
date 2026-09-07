@@ -5,6 +5,8 @@ import extractedExpenses from './extracted_expenses.json';
 import extractedDailyVisitors from './extracted_daily_visitors.json';
 import gymLogo from './assets/logo.jpg';
 import * as db from './neonDb';
+import { supabase } from './supabaseClient';
+
 
 // Default Packages
 const defaultPackages = [
@@ -317,14 +319,62 @@ export default function App() {
   };
 
   useEffect(() => {
+    // Load all data once on startup
     refreshCloudData();
-    
-    // Auto-poll periodically every 60 seconds (optimized to preserve bandwidth and quota)
-    const interval = setInterval(() => {
-      refreshCloudData();
-    }, 60000);
 
-    return () => clearInterval(interval);
+    // Supabase Realtime: hanya kirim data yang BERUBAH saja (hemat bandwidth)
+    const channel = supabase
+      .channel('elfas-gym-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'members' }, ({ eventType, new: n, old: o }) => {
+        const remap = (m) => m ? ({ ...m, packageId: m.package_id || m.packageId, startDate: m.start_date || m.startDate, endDate: m.end_date || m.endDate, totalVisits: m.total_visits ?? m.totalVisits, historyCount: m.history_count ?? m.historyCount, lastVisit: m.last_visit || m.lastVisit }) : null;
+        setMembers(prev => {
+          if (eventType === 'INSERT') return [remap(n), ...prev.filter(m => m.id !== n.id)];
+          if (eventType === 'UPDATE') return prev.map(m => m.id === n.id ? { ...m, ...remap(n) } : m);
+          if (eventType === 'DELETE') return prev.filter(m => m.id !== o.id);
+          return prev;
+        });
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions' }, ({ eventType, new: n, old: o }) => {
+        const remap = (t) => t ? ({ ...t, memberId: t.member_id, memberName: t.member_name, desc: t.description, paymentMethod: t.payment_method, previousEndDate: t.previous_end_date, previousStartDate: t.previous_start_date, previousPackageId: t.previous_package_id }) : null;
+        setTransactions(prev => {
+          if (eventType === 'INSERT') return [remap(n), ...prev.filter(t => t.id !== n.id)];
+          if (eventType === 'DELETE') return prev.filter(t => t.id !== o.id);
+          return prev;
+        });
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'expenses' }, ({ eventType, new: n, old: o }) => {
+        const remap = (e) => e ? ({ ...e, desc: e.description, paymentMethod: e.payment_method }) : null;
+        setExpenses(prev => {
+          if (eventType === 'INSERT') return [remap(n), ...prev.filter(e => e.id !== n.id)];
+          if (eventType === 'UPDATE') return prev.map(e => e.id === n.id ? { ...e, ...remap(n) } : e);
+          if (eventType === 'DELETE') return prev.filter(e => e.id !== o.id);
+          return prev;
+        });
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'daily_visitors' }, ({ eventType, new: n, old: o }) => {
+        const remap = (v) => v ? ({ ...v, amountPaid: v.amount_paid, paymentMethod: v.payment_method }) : null;
+        setDailyVisitors(prev => {
+          if (eventType === 'INSERT') return [remap(n), ...prev.filter(v => v.id !== n.id)];
+          if (eventType === 'UPDATE') return prev.map(v => v.id === n.id ? { ...v, ...remap(n) } : v);
+          if (eventType === 'DELETE') return prev.filter(v => v.id !== o.id);
+          return prev;
+        });
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'attendance_logs' }, ({ eventType, new: n, old: o }) => {
+        const remap = (a) => a ? ({ ...a, memberId: a.member_id, memberName: a.member_name, statusAtCheckIn: a.status_at_check_in, visitNumber: a.visit_number }) : null;
+        setAttendanceLogs(prev => {
+          if (eventType === 'INSERT') return [remap(n), ...prev.filter(a => a.id !== n.id)];
+          if (eventType === 'DELETE') return prev.filter(a => a.id !== o.id);
+          return prev;
+        });
+      })
+      .subscribe((status) => {
+        console.log('Supabase Realtime:', status);
+        if (status === 'SUBSCRIBED') setCloudSyncStatus('connected');
+        else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') setCloudSyncStatus('offline');
+      });
+
+    return () => supabase.removeChannel(channel);
   }, []);
 
   // Search & Filter States
