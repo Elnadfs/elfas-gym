@@ -113928,15 +113928,5 @@
     "date": "2026-09-06",
     "amount": 16000,
     "paymentMethod": "Cash"
-  },
-  {
-    "id": "TX-ADJ-20260931-1",
-    "memberId": null,
-    "memberName": "Kasir (Perpanjangan & Pendapatan Kasir)",
-    "type": "Membership",
-    "desc": "Pemasukan Kasir Tercatat (2026-09-31)",
-    "date": "2026-09-31",
-    "amount": 450000,
-    "paymentMethod": "Cash"
   }
 ]
