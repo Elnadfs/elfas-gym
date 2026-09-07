@@ -81,10 +81,10 @@ export default async function handler(req, res) {
     if (action === "fetchAll") {
       const [mRows, tRows, aRows, eRows, vRows, pRows, prRows, sRows] = await Promise.all([
         fetchAll("members", "id,name,phone,package_id,start_date,end_date,total_visits,history_count,last_visit", "id", true),
-        fetchAll("transactions", "id,member_id,member_name,type,description,date,amount,payment_method,previous_end_date,previous_start_date,previous_package_id", "created_at", false),
-        fetchAll("attendance_logs", "id,member_id,member_name,phone,date,time,status_at_check_in,visit_number", "created_at", false),
-        fetchAll("expenses", "id,date,description,amount,payment_method", "created_at", false),
-        fetchAll("daily_visitors", "id,name,phone,date,amount_paid,payment_method", "created_at", false),
+        fetchAll("transactions", "id,member_id,member_name,type,description,date,amount,payment_method,previous_end_date,previous_start_date,previous_package_id", "id", true),
+        fetchAll("attendance_logs", "id,member_id,member_name,phone,date,time,status_at_check_in,visit_number", "id", true),
+        fetchAll("expenses", "id,date,description,amount,payment_method", "id", true),
+        fetchAll("daily_visitors", "id,name,phone,date,amount_paid,payment_method", "id", true),
         supabase.from("packages").select("id,name,duration,price").order("created_at").then(r => r.data || []),
         supabase.from("products").select("id,name,price,stock").order("created_at").then(r => r.data || []),
         supabase.from("settings").select("key,value").then(r => r.data || []),
