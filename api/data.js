@@ -61,27 +61,44 @@ export default async function handler(req, res) {
   }
 
   try {
+    // Helper to fetch ALL rows via pagination (bypasses Supabase 1000-row default)
+    async function fetchAll(table, columns, orderCol, ascending = false) {
+      const PAGE = 1000;
+      let allRows = [];
+      let from = 0;
+      while (true) {
+        const q = supabase.from(table).select(columns).range(from, from + PAGE - 1);
+        if (orderCol) q.order(orderCol, { ascending });
+        const { data, error } = await q;
+        if (error || !data || data.length === 0) break;
+        allRows = allRows.concat(data);
+        if (data.length < PAGE) break;
+        from += PAGE;
+      }
+      return allRows;
+    }
+
     if (action === "fetchAll") {
-      const [m, t, a, e, v, p, pr, s] = await Promise.all([
-        supabase.from("members").select("id,name,phone,package_id,start_date,end_date,total_visits,history_count,last_visit").order("id").limit(20000),
-        supabase.from("transactions").select("id,member_id,member_name,type,description,date,amount,payment_method,previous_end_date,previous_start_date,previous_package_id").order("created_at", { ascending: false }).limit(20000),
-        supabase.from("attendance_logs").select("id,member_id,member_name,phone,date,time,status_at_check_in,visit_number").order("created_at", { ascending: false }).limit(20000),
-        supabase.from("expenses").select("id,date,description,amount,payment_method").order("created_at", { ascending: false }).limit(5000),
-        supabase.from("daily_visitors").select("id,name,phone,date,amount_paid,payment_method").order("created_at", { ascending: false }).limit(20000),
-        supabase.from("packages").select("id,name,duration,price").order("created_at"),
-        supabase.from("products").select("id,name,price,stock").order("created_at"),
-        supabase.from("settings").select("key,value"),
+      const [mRows, tRows, aRows, eRows, vRows, pRows, prRows, sRows] = await Promise.all([
+        fetchAll("members", "id,name,phone,package_id,start_date,end_date,total_visits,history_count,last_visit", "id", true),
+        fetchAll("transactions", "id,member_id,member_name,type,description,date,amount,payment_method,previous_end_date,previous_start_date,previous_package_id", "created_at", false),
+        fetchAll("attendance_logs", "id,member_id,member_name,phone,date,time,status_at_check_in,visit_number", "created_at", false),
+        fetchAll("expenses", "id,date,description,amount,payment_method", "created_at", false),
+        fetchAll("daily_visitors", "id,name,phone,date,amount_paid,payment_method", "created_at", false),
+        supabase.from("packages").select("id,name,duration,price").order("created_at").then(r => r.data || []),
+        supabase.from("products").select("id,name,price,stock").order("created_at").then(r => r.data || []),
+        supabase.from("settings").select("key,value").then(r => r.data || []),
       ]);
       const settingsObj = {};
-      if (s.data) s.data.forEach(r => { settingsObj[r.key] = r.value; });
+      sRows.forEach(r => { settingsObj[r.key] = r.value; });
       return res.status(200).json({
-        members: (m.data || []).map(remap.member),
-        transactions: (t.data || []).map(remap.transaction),
-        attendanceLogs: (a.data || []).map(remap.attendance),
-        expenses: (e.data || []).map(remap.expense),
-        dailyVisitors: (v.data || []).map(remap.visitor),
-        packages: p.data || [],
-        products: pr.data || [],
+        members: mRows.map(remap.member),
+        transactions: tRows.map(remap.transaction),
+        attendanceLogs: aRows.map(remap.attendance),
+        expenses: eRows.map(remap.expense),
+        dailyVisitors: vRows.map(remap.visitor),
+        packages: pRows,
+        products: prRows,
         settings: settingsObj,
       });
     }
