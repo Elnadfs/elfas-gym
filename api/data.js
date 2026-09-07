@@ -1,4 +1,4 @@
-﻿import { createClient } from "@supabase/supabase-js";
+import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
   process.env.SUPABASE_URL || "https://bbpoecfwqjcmmvtwiwed.supabase.co",
@@ -63,11 +63,11 @@ export default async function handler(req, res) {
   try {
     if (action === "fetchAll") {
       const [m, t, a, e, v, p, pr, s] = await Promise.all([
-        supabase.from("members").select("id,name,phone,package_id,start_date,end_date,total_visits,history_count,last_visit").order("id"),
-        supabase.from("transactions").select("id,member_id,member_name,type,description,date,amount,payment_method,previous_end_date,previous_start_date,previous_package_id").order("created_at", { ascending: false }),
-        supabase.from("attendance_logs").select("id,member_id,member_name,phone,date,time,status_at_check_in,visit_number").order("created_at", { ascending: false }),
-        supabase.from("expenses").select("id,date,description,amount,payment_method").order("created_at", { ascending: false }),
-        supabase.from("daily_visitors").select("id,name,phone,date,amount_paid,payment_method").order("created_at", { ascending: false }),
+        supabase.from("members").select("id,name,phone,package_id,start_date,end_date,total_visits,history_count,last_visit").order("id").limit(20000),
+        supabase.from("transactions").select("id,member_id,member_name,type,description,date,amount,payment_method,previous_end_date,previous_start_date,previous_package_id").order("created_at", { ascending: false }).limit(20000),
+        supabase.from("attendance_logs").select("id,member_id,member_name,phone,date,time,status_at_check_in,visit_number").order("created_at", { ascending: false }).limit(20000),
+        supabase.from("expenses").select("id,date,description,amount,payment_method").order("created_at", { ascending: false }).limit(5000),
+        supabase.from("daily_visitors").select("id,name,phone,date,amount_paid,payment_method").order("created_at", { ascending: false }).limit(20000),
         supabase.from("packages").select("id,name,duration,price").order("created_at"),
         supabase.from("products").select("id,name,price,stock").order("created_at"),
         supabase.from("settings").select("key,value"),
