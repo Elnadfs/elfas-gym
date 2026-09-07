@@ -1,5 +1,12 @@
 [
   {
+    "id": "EXP-ADJ-20260103-1",
+    "date": "2026-01-03",
+    "desc": "Operasional Kasir Tercatat (2026-01-03)",
+    "amount": 30000,
+    "paymentMethod": "Cash"
+  },
+  {
     "id": "EXP-20260105-01",
     "date": "2026-01-05",
     "desc": "GALON",
@@ -217,6 +224,13 @@
     "paymentMethod": "Cash"
   },
   {
+    "id": "EXP-ADJ-20260203-1",
+    "date": "2026-02-03",
+    "desc": "Operasional Kasir Tercatat (2026-02-03)",
+    "amount": 70000,
+    "paymentMethod": "Cash"
+  },
+  {
     "id": "EXP-20260204-01",
     "date": "2026-02-04",
     "desc": "GALON",
@@ -375,6 +389,13 @@
     "date": "2026-03-03",
     "desc": "GALON",
     "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-ADJ-20260304-1",
+    "date": "2026-03-04",
+    "desc": "Operasional Kasir Tercatat (2026-03-04)",
+    "amount": 414000,
     "paymentMethod": "Cash"
   },
   {
@@ -609,6 +630,20 @@
     "paymentMethod": "Cash"
   },
   {
+    "id": "EXP-20260407-01",
+    "date": "2026-04-07",
+    "desc": "FRUTEA",
+    "amount": 168000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260407-02",
+    "date": "2026-04-07",
+    "desc": "GALON",
+    "amount": 27500,
+    "paymentMethod": "Cash"
+  },
+  {
     "id": "EXP-20260408-01",
     "date": "2026-04-08",
     "desc": "SOLASI",
@@ -644,27 +679,6 @@
     "paymentMethod": "Cash"
   },
   {
-    "id": "EXP-20260407-01",
-    "date": "2026-04-07",
-    "desc": "FRUTEA",
-    "amount": 168000,
-    "paymentMethod": "Cash"
-  },
-  {
-    "id": "EXP-20260407-02",
-    "date": "2026-04-07",
-    "desc": "GALON",
-    "amount": 27500,
-    "paymentMethod": "Cash"
-  },
-  {
-    "id": "EXP-20260411-01",
-    "date": "2026-04-11",
-    "desc": "GALON",
-    "amount": 33000,
-    "paymentMethod": "Cash"
-  },
-  {
     "id": "EXP-20260410-01",
     "date": "2026-04-10",
     "desc": "CAT",
@@ -683,6 +697,13 @@
     "date": "2026-04-10",
     "desc": "PAK JUN",
     "amount": 25000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260411-01",
+    "date": "2026-04-11",
+    "desc": "GALON",
+    "amount": 33000,
     "paymentMethod": "Cash"
   },
   {
@@ -805,10 +826,24 @@
     "paymentMethod": "Cash"
   },
   {
+    "id": "EXP-ADJ-20260423-1",
+    "date": "2026-04-23",
+    "desc": "Operasional Kasir Tercatat (2026-04-23)",
+    "amount": 120000,
+    "paymentMethod": "Cash"
+  },
+  {
     "id": "EXP-20260425-01",
     "date": "2026-04-25",
     "desc": "GALON",
     "amount": 33000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-ADJ-20260425-1",
+    "date": "2026-04-25",
+    "desc": "Operasional Kasir Tercatat (2026-04-25)",
+    "amount": 16500,
     "paymentMethod": "Cash"
   },
   {
@@ -872,6 +907,13 @@
     "date": "2026-05-02",
     "desc": "GALON",
     "amount": 22000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-ADJ-20260503-1",
+    "date": "2026-05-03",
+    "desc": "Operasional Kasir Tercatat (2026-05-03)",
+    "amount": 6000,
     "paymentMethod": "Cash"
   },
   {
@@ -1085,6 +1127,13 @@
     "paymentMethod": "Cash"
   },
   {
+    "id": "EXP-ADJ-20260526-1",
+    "date": "2026-05-26",
+    "desc": "Operasional Kasir Tercatat (2026-05-26)",
+    "amount": 1000,
+    "paymentMethod": "Cash"
+  },
+  {
     "id": "EXP-20260528-01",
     "date": "2026-05-28",
     "desc": "MUR BAUT",
@@ -1176,20 +1225,6 @@
     "paymentMethod": "Cash"
   },
   {
-    "id": "EXP-20260609-01",
-    "date": "2026-06-09",
-    "desc": "GALON",
-    "amount": 16500,
-    "paymentMethod": "Cash"
-  },
-  {
-    "id": "EXP-20260609-02",
-    "date": "2026-06-09",
-    "desc": "TISSUE",
-    "amount": 43000,
-    "paymentMethod": "Cash"
-  },
-  {
     "id": "EXP-20260608-01",
     "date": "2026-06-08",
     "desc": "POCARI",
@@ -1201,6 +1236,20 @@
     "date": "2026-06-08",
     "desc": "ELNAD (CUCI MOBIL)",
     "amount": 50000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260609-01",
+    "date": "2026-06-09",
+    "desc": "GALON",
+    "amount": 16500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260609-02",
+    "date": "2026-06-09",
+    "desc": "TISSUE",
+    "amount": 43000,
     "paymentMethod": "Cash"
   },
   {
@@ -1250,6 +1299,13 @@
     "date": "2026-06-14",
     "desc": "TISSUE",
     "amount": 95000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-ADJ-20260614-1",
+    "date": "2026-06-14",
+    "desc": "Operasional Kasir Tercatat (2026-06-14)",
+    "amount": 585000,
     "paymentMethod": "Cash"
   },
   {
@@ -1323,34 +1379,6 @@
     "paymentMethod": "Cash"
   },
   {
-    "id": "EXP-20260630-01",
-    "date": "2026-06-30",
-    "desc": "KUAS",
-    "amount": 8000,
-    "paymentMethod": "Cash"
-  },
-  {
-    "id": "EXP-20260630-02",
-    "date": "2026-06-30",
-    "desc": "SELOTIP",
-    "amount": 8000,
-    "paymentMethod": "Cash"
-  },
-  {
-    "id": "EXP-20260630-03",
-    "date": "2026-06-30",
-    "desc": "HANDSANITIZER",
-    "amount": 96000,
-    "paymentMethod": "Cash"
-  },
-  {
-    "id": "EXP-20260630-04",
-    "date": "2026-06-30",
-    "desc": "GALON",
-    "amount": 16500,
-    "paymentMethod": "Cash"
-  },
-  {
     "id": "EXP-20260624-01",
     "date": "2026-06-24",
     "desc": "KIT",
@@ -1407,6 +1435,34 @@
     "paymentMethod": "Cash"
   },
   {
+    "id": "EXP-20260630-01",
+    "date": "2026-06-30",
+    "desc": "KUAS",
+    "amount": 8000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260630-02",
+    "date": "2026-06-30",
+    "desc": "SELOTIP",
+    "amount": 8000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260630-03",
+    "date": "2026-06-30",
+    "desc": "HANDSANITIZER",
+    "amount": 96000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-20260630-04",
+    "date": "2026-06-30",
+    "desc": "GALON",
+    "amount": 16500,
+    "paymentMethod": "Cash"
+  },
+  {
     "id": "EXP-20260701-01",
     "date": "2026-07-01",
     "desc": "GALON",
@@ -1418,6 +1474,13 @@
     "date": "2026-07-02",
     "desc": "GALON",
     "amount": 16500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-ADJ-20260703-1",
+    "date": "2026-07-03",
+    "desc": "Operasional Kasir Tercatat (2026-07-03)",
+    "amount": 30000,
     "paymentMethod": "Cash"
   },
   {
@@ -1701,6 +1764,13 @@
     "paymentMethod": "Cash"
   },
   {
+    "id": "EXP-ADJ-20260803-1",
+    "date": "2026-08-03",
+    "desc": "Operasional Kasir Tercatat (2026-08-03)",
+    "amount": 10000,
+    "paymentMethod": "Cash"
+  },
+  {
     "id": "EXP-20260804-01",
     "date": "2026-08-04",
     "desc": "GALON",
@@ -1740,6 +1810,13 @@
     "date": "2026-08-06",
     "desc": "GALON",
     "amount": 16500,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-ADJ-20260806-1",
+    "date": "2026-08-06",
+    "desc": "Operasional Kasir Tercatat (2026-08-06)",
+    "amount": 615000,
     "paymentMethod": "Cash"
   },
   {
@@ -1817,6 +1894,13 @@
     "date": "2026-08-14",
     "desc": "POCARI",
     "amount": 314400,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-ADJ-20260814-1",
+    "date": "2026-08-14",
+    "desc": "Operasional Kasir Tercatat (2026-08-14)",
+    "amount": 285600,
     "paymentMethod": "Cash"
   },
   {
@@ -2062,6 +2146,13 @@
     "date": "2026-09-03",
     "desc": "PAK JUN",
     "amount": 50000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "EXP-ADJ-20260903-1",
+    "date": "2026-09-03",
+    "desc": "Operasional Kasir Tercatat (2026-09-03)",
+    "amount": 22000,
     "paymentMethod": "Cash"
   },
   {
