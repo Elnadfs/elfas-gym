@@ -1,5 +1,485 @@
 [
   {
+    "id": "TX-DLY-20260906-001",
+    "memberId": null,
+    "memberName": "SASA",
+    "type": "Kunjungan Harian",
+    "desc": "Kunjungan Harian: SASA (1 Orang)",
+    "date": "2026-09-06",
+    "amount": 20000,
+    "paymentMethod": "QRIS"
+  },
+  {
+    "id": "TX-DLY-20260906-002",
+    "memberId": null,
+    "memberName": "ARKA",
+    "type": "Kunjungan Harian",
+    "desc": "Kunjungan Harian: ARKA (1 Orang)",
+    "date": "2026-09-06",
+    "amount": 20000,
+    "paymentMethod": "QRIS"
+  },
+  {
+    "id": "TX-DLY-20260906-003",
+    "memberId": null,
+    "memberName": "DAVID",
+    "type": "Kunjungan Harian",
+    "desc": "Kunjungan Harian: DAVID (1 Orang)",
+    "date": "2026-09-06",
+    "amount": 20000,
+    "paymentMethod": "QRIS"
+  },
+  {
+    "id": "TX-DLY-20260906-004",
+    "memberId": null,
+    "memberName": "SODIQ",
+    "type": "Kunjungan Harian",
+    "desc": "Kunjungan Harian: SODIQ (1 Orang)",
+    "date": "2026-09-06",
+    "amount": 20000,
+    "paymentMethod": "QRIS"
+  },
+  {
+    "id": "TX-DLY-20260906-005",
+    "memberId": null,
+    "memberName": "DANI",
+    "type": "Kunjungan Harian",
+    "desc": "Kunjungan Harian: DANI (1 Orang)",
+    "date": "2026-09-06",
+    "amount": 20000,
+    "paymentMethod": "QRIS"
+  },
+  {
+    "id": "TX-DLY-20260906-006",
+    "memberId": null,
+    "memberName": "RENDI",
+    "type": "Kunjungan Harian",
+    "desc": "Kunjungan Harian: RENDI (1 Orang)",
+    "date": "2026-09-06",
+    "amount": 20000,
+    "paymentMethod": "QRIS"
+  },
+  {
+    "id": "TX-DLY-20260906-007",
+    "memberId": null,
+    "memberName": "ALVIN",
+    "type": "Kunjungan Harian",
+    "desc": "Kunjungan Harian: ALVIN (1 Orang)",
+    "date": "2026-09-06",
+    "amount": 20000,
+    "paymentMethod": "QRIS"
+  },
+  {
+    "id": "TX-DLY-20260906-008",
+    "memberId": null,
+    "memberName": "ALETA",
+    "type": "Kunjungan Harian",
+    "desc": "Kunjungan Harian: ALETA (1 Orang)",
+    "date": "2026-09-06",
+    "amount": 20000,
+    "paymentMethod": "QRIS"
+  },
+  {
+    "id": "TX-DLY-20260906-009",
+    "memberId": null,
+    "memberName": "BAGUS",
+    "type": "Kunjungan Harian",
+    "desc": "Kunjungan Harian: BAGUS (1 Orang)",
+    "date": "2026-09-06",
+    "amount": 20000,
+    "paymentMethod": "QRIS"
+  },
+  {
+    "id": "TX-DLY-20260906-010",
+    "memberId": null,
+    "memberName": "NMALUM",
+    "type": "Kunjungan Harian",
+    "desc": "Kunjungan Harian: NMALUM (1 Orang)",
+    "date": "2026-09-06",
+    "amount": 20000,
+    "paymentMethod": "QRIS"
+  },
+  {
+    "id": "TX-DLY-20260906-011",
+    "memberId": null,
+    "memberName": "SERAFINO",
+    "type": "Kunjungan Harian",
+    "desc": "Kunjungan Harian: SERAFINO (1 Orang)",
+    "date": "2026-09-06",
+    "amount": 20000,
+    "paymentMethod": "QRIS"
+  },
+  {
+    "id": "TX-DLY-20260906-012",
+    "memberId": null,
+    "memberName": "NEMA",
+    "type": "Kunjungan Harian",
+    "desc": "Kunjungan Harian: NEMA (1 Orang)",
+    "date": "2026-09-06",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "TX-DLY-20260906-013",
+    "memberId": null,
+    "memberName": "LINTANG",
+    "type": "Kunjungan Harian",
+    "desc": "Kunjungan Harian: LINTANG (1 Orang)",
+    "date": "2026-09-06",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "TX-DLY-20260906-014",
+    "memberId": null,
+    "memberName": "TAMA",
+    "type": "Kunjungan Harian",
+    "desc": "Kunjungan Harian: TAMA (1 Orang)",
+    "date": "2026-09-06",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "TX-DLY-20260906-015",
+    "memberId": null,
+    "memberName": "ARYO",
+    "type": "Kunjungan Harian",
+    "desc": "Kunjungan Harian: ARYO (1 Orang)",
+    "date": "2026-09-06",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "TX-DLY-20260906-016",
+    "memberId": null,
+    "memberName": "CATUR",
+    "type": "Kunjungan Harian",
+    "desc": "Kunjungan Harian: CATUR (1 Orang)",
+    "date": "2026-09-06",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "TX-DLY-20260906-017",
+    "memberId": null,
+    "memberName": "FIKA",
+    "type": "Kunjungan Harian",
+    "desc": "Kunjungan Harian: FIKA (1 Orang)",
+    "date": "2026-09-06",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "TX-DLY-20260906-018",
+    "memberId": null,
+    "memberName": "ALVI",
+    "type": "Kunjungan Harian",
+    "desc": "Kunjungan Harian: ALVI (1 Orang)",
+    "date": "2026-09-06",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "TX-DLY-20260906-019",
+    "memberId": null,
+    "memberName": "ALEN",
+    "type": "Kunjungan Harian",
+    "desc": "Kunjungan Harian: ALEN (1 Orang)",
+    "date": "2026-09-06",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "TX-DLY-20260906-020",
+    "memberId": null,
+    "memberName": "ALVIN",
+    "type": "Kunjungan Harian",
+    "desc": "Kunjungan Harian: ALVIN (1 Orang)",
+    "date": "2026-09-06",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "TX-DLY-20260906-021",
+    "memberId": null,
+    "memberName": "DITO",
+    "type": "Kunjungan Harian",
+    "desc": "Kunjungan Harian: DITO (1 Orang)",
+    "date": "2026-09-06",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "TX-DLY-20260906-022",
+    "memberId": null,
+    "memberName": "DIFA",
+    "type": "Kunjungan Harian",
+    "desc": "Kunjungan Harian: DIFA (1 Orang)",
+    "date": "2026-09-06",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "TX-DLY-20260906-023",
+    "memberId": null,
+    "memberName": "BIAN",
+    "type": "Kunjungan Harian",
+    "desc": "Kunjungan Harian: BIAN (1 Orang)",
+    "date": "2026-09-06",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "TX-DLY-20260906-024",
+    "memberId": null,
+    "memberName": "EVI",
+    "type": "Kunjungan Harian",
+    "desc": "Kunjungan Harian: EVI (1 Orang)",
+    "date": "2026-09-06",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "TX-DLY-20260906-025",
+    "memberId": null,
+    "memberName": "DRMONO",
+    "type": "Kunjungan Harian",
+    "desc": "Kunjungan Harian: DRMONO (1 Orang)",
+    "date": "2026-09-06",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "TX-DLY-20260906-026",
+    "memberId": null,
+    "memberName": "DOSEN",
+    "type": "Kunjungan Harian",
+    "desc": "Kunjungan Harian: DOSEN (1 Orang)",
+    "date": "2026-09-06",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "TX-DLY-20260906-027",
+    "memberId": null,
+    "memberName": "AGUS",
+    "type": "Kunjungan Harian",
+    "desc": "Kunjungan Harian: AGUS (1 Orang)",
+    "date": "2026-09-06",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "TX-DLY-20260906-028",
+    "memberId": null,
+    "memberName": "NTT",
+    "type": "Kunjungan Harian",
+    "desc": "Kunjungan Harian: NTT (1 Orang)",
+    "date": "2026-09-06",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "TX-DLY-20260906-029",
+    "memberId": null,
+    "memberName": "ARAB",
+    "type": "Kunjungan Harian",
+    "desc": "Kunjungan Harian: ARAB (1 Orang)",
+    "date": "2026-09-06",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "TX-DLY-20260906-030",
+    "memberId": null,
+    "memberName": "RAFA",
+    "type": "Kunjungan Harian",
+    "desc": "Kunjungan Harian: RAFA (1 Orang)",
+    "date": "2026-09-06",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "TX-DLY-20260906-031",
+    "memberId": null,
+    "memberName": "DIO",
+    "type": "Kunjungan Harian",
+    "desc": "Kunjungan Harian: DIO (1 Orang)",
+    "date": "2026-09-06",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "TX-DLY-20260906-032",
+    "memberId": null,
+    "memberName": "DEWA",
+    "type": "Kunjungan Harian",
+    "desc": "Kunjungan Harian: DEWA (1 Orang)",
+    "date": "2026-09-06",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "TX-DLY-20260906-033",
+    "memberId": null,
+    "memberName": "TOBI",
+    "type": "Kunjungan Harian",
+    "desc": "Kunjungan Harian: TOBI (1 Orang)",
+    "date": "2026-09-06",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "TX-DLY-20260906-034",
+    "memberId": null,
+    "memberName": "NOVI",
+    "type": "Kunjungan Harian",
+    "desc": "Kunjungan Harian: NOVI (1 Orang)",
+    "date": "2026-09-06",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "TX-DLY-20260906-035",
+    "memberId": null,
+    "memberName": "HAFIS",
+    "type": "Kunjungan Harian",
+    "desc": "Kunjungan Harian: HAFIS (1 Orang)",
+    "date": "2026-09-06",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "TX-DLY-20260906-036",
+    "memberId": null,
+    "memberName": "RAMA",
+    "type": "Kunjungan Harian",
+    "desc": "Kunjungan Harian: RAMA (1 Orang)",
+    "date": "2026-09-06",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "TX-DLY-20260906-037",
+    "memberId": null,
+    "memberName": "ADIP",
+    "type": "Kunjungan Harian",
+    "desc": "Kunjungan Harian: ADIP (1 Orang)",
+    "date": "2026-09-06",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "TX-DLY-20260906-038",
+    "memberId": null,
+    "memberName": "ARYO",
+    "type": "Kunjungan Harian",
+    "desc": "Kunjungan Harian: ARYO (1 Orang)",
+    "date": "2026-09-06",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "TX-DLY-20260906-039",
+    "memberId": null,
+    "memberName": "YOAN",
+    "type": "Kunjungan Harian",
+    "desc": "Kunjungan Harian: YOAN (1 Orang)",
+    "date": "2026-09-06",
+    "amount": 20000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "TX-RNW-20260906-1957",
+    "memberId": "MBR-1957",
+    "memberName": "SEPTIANA",
+    "type": "Membership",
+    "desc": "Perpanjangan Membership (MBR-1957 SEPTIANA)",
+    "date": "2026-09-06",
+    "amount": 150000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "TX-RNW-20260906-0698",
+    "memberId": "MBR-0698",
+    "memberName": "DIAN",
+    "type": "Membership",
+    "desc": "Perpanjangan Membership (MBR-0698 DIAN)",
+    "date": "2026-09-06",
+    "amount": 150000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "TX-RNW-20260906-0699",
+    "memberId": "MBR-0699",
+    "memberName": "ELL",
+    "type": "Membership",
+    "desc": "Perpanjangan Membership (MBR-0699 ELL)",
+    "date": "2026-09-06",
+    "amount": 150000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "TX-STR-20260906-01",
+    "memberId": null,
+    "memberName": "Pembeli Toko",
+    "type": "Toko",
+    "desc": "MY PROTEIN (x7)",
+    "date": "2026-09-06",
+    "amount": 119000,
+    "paymentMethod": "QRIS"
+  },
+  {
+    "id": "TX-STR-20260906-02",
+    "memberId": null,
+    "memberName": "Pembeli Toko",
+    "type": "Toko",
+    "desc": "Mineral water 1.5 L (x7)",
+    "date": "2026-09-06",
+    "amount": 42000,
+    "paymentMethod": "QRIS"
+  },
+  {
+    "id": "TX-STR-20260906-03a",
+    "memberId": null,
+    "memberName": "Pembeli Toko",
+    "type": "Toko",
+    "desc": "Mineral Water 600 ml (x6)",
+    "date": "2026-09-06",
+    "amount": 18000,
+    "paymentMethod": "QRIS"
+  },
+  {
+    "id": "TX-STR-20260906-03b",
+    "memberId": null,
+    "memberName": "Pembeli Toko",
+    "type": "Toko",
+    "desc": "Mineral Water 600 ml (x19)",
+    "date": "2026-09-06",
+    "amount": 57000,
+    "paymentMethod": "Cash"
+  },
+  {
+    "id": "TX-STR-20260906-04",
+    "memberId": null,
+    "memberName": "Pembeli Toko",
+    "type": "Toko",
+    "desc": "FITBAR (x1)",
+    "date": "2026-09-06",
+    "amount": 7000,
+    "paymentMethod": "QRIS"
+  },
+  {
+    "id": "TX-STR-20260906-05",
+    "memberId": null,
+    "memberName": "Pembeli Toko",
+    "type": "Toko",
+    "desc": "Pocari (x2)",
+    "date": "2026-09-06",
+    "amount": 16000,
+    "paymentMethod": "Cash"
+  },
+  {
     "id": "TX-DLY-20260905-001",
     "memberId": null,
     "memberName": "SIDIQ",

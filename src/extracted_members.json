@@ -6904,8 +6904,8 @@
     "name": "ELL",
     "phone": "-",
     "packageId": "pkg-1",
-    "startDate": "2026-01-01",
-    "endDate": "2026-02-01",
+    "startDate": "2026-09-06",
+    "endDate": "2026-10-06",
     "totalVisits": 14,
     "historyCount": 1
   },
@@ -6914,8 +6914,8 @@
     "name": "DIAN W",
     "phone": "-",
     "packageId": "pkg-1",
-    "startDate": "2026-04-03",
-    "endDate": "2026-05-03",
+    "startDate": "2026-09-06",
+    "endDate": "2026-10-06",
     "totalVisits": 31,
     "historyCount": 2
   },
@@ -19424,8 +19424,8 @@
     "name": "SEPTIANA D",
     "phone": "-",
     "packageId": "pkg-1",
-    "startDate": "2026-07-06",
-    "endDate": "2026-08-06",
+    "startDate": "2026-09-06",
+    "endDate": "2026-10-06",
     "totalVisits": 64,
     "historyCount": 2
   },
